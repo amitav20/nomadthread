@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') !== 'local') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         \Illuminate\Support\Facades\View::composer(['layouts.frontend', 'frontend.*'], function ($view) {
             // Check if table exists to avoid errors on migration
             if (\Illuminate\Support\Facades\Schema::hasTable('categories')) {
