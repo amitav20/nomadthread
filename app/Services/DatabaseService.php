@@ -53,9 +53,6 @@ class DatabaseService
         return true;
     }
 
-    /**
-     * Create tables using Schema facade.
-     */
     private static function createTables(): void
     {
         if (!Schema::hasTable('users')) {
@@ -67,6 +64,12 @@ class DatabaseService
                 $table->string('role')->default('user');
                 $table->timestamp('created_at')->useCurrent();
             });
+        } else {
+            if (!Schema::hasColumn('users', 'role')) {
+                Schema::table('users', function ($table) {
+                    $table->string('role')->default('user');
+                });
+            }
         }
 
         if (!Schema::hasTable('threads')) {
@@ -87,14 +90,29 @@ class DatabaseService
      */
     private static function seedDatabase(): void
     {
-        // Check if users exist
-        if (DB::table('users')->count() > 0) {
+        // Ensure the admin user exists and has the correct password and role
+        $admin = DB::table('users')->where('email', 'admin@nomadthread.test')->first();
+        if ($admin) {
+            DB::table('users')->where('email', 'admin@nomadthread.test')->update([
+                'role' => 'admin',
+                'password' => password_hash('password', PASSWORD_DEFAULT),
+            ]);
+        } else {
+            DB::table('users')->insert([
+                'name' => 'Alex Mercer (Admin)',
+                'email' => 'admin@nomadthread.test',
+                'password' => password_hash('password', PASSWORD_DEFAULT),
+                'role' => 'admin',
+            ]);
+        }
+
+        // Check if other users exist
+        if (DB::table('users')->count() > 1) {
             return;
         }
 
         // Seed users
         $usersData = [
-            ['Alex Mercer (Admin)', 'admin@nomadthread.test', password_hash('password', PASSWORD_DEFAULT), 'admin'],
             ['Sophia Martinez', 'sophia@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
             ['Kai Tanaka', 'kai@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
             ['Elena Rostova', 'elena@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
@@ -102,6 +120,11 @@ class DatabaseService
         ];
 
         $userIds = [];
+        $adminUser = DB::table('users')->where('email', 'admin@nomadthread.test')->first();
+        if ($adminUser) {
+            $userIds[] = $adminUser->id;
+        }
+
         foreach ($usersData as $userData) {
             $userIds[] = DB::table('users')->insertGetId([
                 'name' => $userData[0],
