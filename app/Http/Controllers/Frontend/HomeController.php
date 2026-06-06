@@ -19,40 +19,20 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
-        $mysqli = DatabaseService::getConnection();
+        DatabaseService::getConnection();
 
         // 1. Get user count
-        $userCount = 0;
-        if ($result = $mysqli->query("SELECT COUNT(*) as count FROM users")) {
-            $row = $result->fetch_assoc();
-            $userCount = $row['count'] ?? 0;
-        }
+        $userCount = \App\Models\User::count();
 
         // 2. Get thread count
-        $threadCount = 0;
-        if ($result = $mysqli->query("SELECT COUNT(*) as count FROM threads")) {
-            $row = $result->fetch_assoc();
-            $threadCount = $row['count'] ?? 0;
-        }
+        $threadCount = \App\Models\Thread::count();
 
         // 3. Get 3 most recent active threads along with the user name
-        $featuredThreads = [];
-        $query = "
-            SELECT t.*, u.name as user_name 
-            FROM threads t 
-            JOIN users u ON t.user_id = u.id 
-            WHERE t.status = 'active' 
-            ORDER BY t.created_at DESC 
-            LIMIT 3
-        ";
-        if ($result = $mysqli->query($query)) {
-            while ($row = $result->fetch_object()) {
-                // Mock the Eloquent relation so Blade doesn't break
-                $row->user = (object) ['name' => $row->user_name];
-                $row->created_at = Carbon::parse($row->created_at);
-                $featuredThreads[] = $row;
-            }
-        }
+        $featuredThreads = \App\Models\Thread::with('user')
+            ->where('status', 'active')
+            ->latest()
+            ->limit(3)
+            ->get();
 
         // 4. Fetch e-commerce data from API and decode
         $bannersResponse = $this->api->banners();

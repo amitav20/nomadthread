@@ -2,101 +2,92 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 class DatabaseService
 {
-    private static $connection = null;
+    private static $initialized = false;
 
     /**
-     * Get a mysqli connection to the MySQL database.
+     * Get a connection indicator to ensure the database is initialized.
      * Auto-creates the database, tables, and seeds them with demo data if empty.
      */
-    public static function getConnection(): \mysqli
+    public static function getConnection()
     {
-        if (self::$connection !== null) {
-            return self::$connection;
+        if (self::$initialized) {
+            return true;
         }
 
-        $host = config('database.connections.mysql.host', '127.0.0.1');
-        $username = config('database.connections.mysql.username', 'root');
-        $password = config('database.connections.mysql.password', '');
-        $database = config('database.connections.mysql.database', 'nomadthread');
-        $port = config('database.connections.mysql.port', '3306');
+        $connection = config('database.default', 'mysql');
+        if ($connection === 'mysql') {
+            $database = config('database.connections.mysql.database', 'nomadthread');
+            try {
+                DB::connection()->getPdo();
+            } catch (\Exception $e) {
+                // Connection failed, database might not exist.
+                $config = config('database.connections.mysql');
+                $tempConfig = $config;
+                $tempConfig['database'] = ''; // Connect without database
 
-        // 1. Connect to MySQL server (without specifying DB to handle auto-creation)
-        $mysqli = @new \mysqli($host, $username, $password, '', $port);
-        if ($mysqli->connect_error) {
-            throw new \Exception("Database connection failed: " . $mysqli->connect_error);
+                config(['database.connections.mysql_temp' => $tempConfig]);
+
+                try {
+                    $pdo = DB::connection('mysql_temp')->getPdo();
+                    $dbEscaped = str_replace('`', '``', $database);
+                    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbEscaped` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    DB::purge('mysql_temp');
+                } catch (\Exception $ex) {
+                    throw new \Exception("Database connection & auto-creation failed: " . $ex->getMessage());
+                }
+            }
         }
 
-        // 2. Create database if it doesn't exist
-        $dbEscaped = $mysqli->real_escape_string($database);
-        if (!$mysqli->query("CREATE DATABASE IF NOT EXISTS `$dbEscaped` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")) {
-            throw new \Exception("Failed to create database: " . $mysqli->error);
-        }
+        // Create Tables if they don't exist
+        self::createTables();
 
-        // 3. Select the database
-        if (!$mysqli->select_db($database)) {
-            throw new \Exception("Failed to select database: " . $mysqli->error);
-        }
+        // Seed Data if database is empty
+        self::seedDatabase();
 
-        // 4. Create Tables if they don't exist
-        self::createTables($mysqli);
-
-        // 5. Seed Data if database is empty
-        self::seedDatabase($mysqli);
-
-        self::$connection = $mysqli;
-        return self::$connection;
+        self::$initialized = true;
+        return true;
     }
 
     /**
-     * Create tables using raw SQL queries.
+     * Create tables using Schema facade.
      */
-    private static function createTables(\mysqli $mysqli): void
+    private static function createTables(): void
     {
-        // Users Table
-        $createUsersQuery = "
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB;
-        ";
-        if (!$mysqli->query($createUsersQuery)) {
-            throw new \Exception("Failed to create users table: " . $mysqli->error);
+        if (!Schema::hasTable('users')) {
+            Schema::create('users', function ($table) {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->unique();
+                $table->string('password');
+                $table->timestamp('created_at')->useCurrent();
+            });
         }
 
-        // Threads Table
-        $createThreadsQuery = "
-            CREATE TABLE IF NOT EXISTS threads (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                location VARCHAR(255) DEFAULT NULL,
-                status VARCHAR(50) DEFAULT 'active',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            ) ENGINE=InnoDB;
-        ";
-        if (!$mysqli->query($createThreadsQuery)) {
-            throw new \Exception("Failed to create threads table: " . $mysqli->error);
+        if (!Schema::hasTable('threads')) {
+            Schema::create('threads', function ($table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->string('title');
+                $table->text('content');
+                $table->string('location')->nullable();
+                $table->string('status')->default('active');
+                $table->timestamp('created_at')->useCurrent();
+            });
         }
     }
 
     /**
      * Seed database with dummy users and nomad threads if users table is empty.
      */
-    private static function seedDatabase(\mysqli $mysqli): void
+    private static function seedDatabase(): void
     {
         // Check if users exist
-        $result = $mysqli->query("SELECT COUNT(*) as count FROM users");
-        $row = $result->fetch_assoc();
-        
-        if ($row['count'] > 0) {
-            // Already seeded
+        if (DB::table('users')->count() > 0) {
             return;
         }
 
@@ -110,13 +101,13 @@ class DatabaseService
         ];
 
         $userIds = [];
-        $stmt = $mysqli->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
         foreach ($usersData as $userData) {
-            $stmt->bind_param("sss", $userData[0], $userData[1], $userData[2]);
-            $stmt->execute();
-            $userIds[] = $mysqli->insert_id;
+            $userIds[] = DB::table('users')->insertGetId([
+                'name' => $userData[0],
+                'email' => $userData[1],
+                'password' => $userData[2],
+            ]);
         }
-        $stmt->close();
 
         // Seed Nomad Threads
         $threadsData = [
@@ -158,12 +149,15 @@ class DatabaseService
             ]
         ];
 
-        $stmt = $mysqli->prepare("INSERT INTO threads (user_id, title, content, location, status) VALUES (?, ?, ?, ?, ?)");
         foreach ($threadsData as $threadData) {
             $randomUserId = $userIds[array_rand($userIds)];
-            $stmt->bind_param("issss", $randomUserId, $threadData['title'], $threadData['content'], $threadData['location'], $threadData['status']);
-            $stmt->execute();
+            DB::table('threads')->insert([
+                'user_id' => $randomUserId,
+                'title' => $threadData['title'],
+                'content' => $threadData['content'],
+                'location' => $threadData['location'],
+                'status' => $threadData['status'],
+            ]);
         }
-        $stmt->close();
     }
 }
