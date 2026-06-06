@@ -15,7 +15,7 @@
   <div class="sidebar-logo">
     <div class="logo-mark">
       <div class="logo-icon"><i class="ti ti-briefcase"></i></div>
-      <div><div class="logo-text">LeatherCraft</div><div class="logo-sub">Admin Panel</div></div>
+      <div><div class="logo-text">NomadThread</div><div class="logo-sub">Admin Panel</div></div>
     </div>
   </div>
   <div class="sidebar-section">

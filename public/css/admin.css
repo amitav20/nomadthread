@@ -386,3 +386,92 @@ input[type="checkbox"]{accent-color:var(--gold);width:14px;height:14px;cursor:po
   color: var(--text2) !important;
 }
 
+/* Sidebar Leather Theme Customization */
+.sidebar {
+  background: #251710 !important; /* Rich dark espresso leather */
+  border-right: 1px solid #362319 !important;
+}
+.sidebar-logo {
+  border-bottom: 1px solid #362319 !important;
+}
+.logo-icon {
+  background: linear-gradient(135deg, #c9a84c, #a88734) !important;
+  color: #251710 !important;
+}
+.logo-text {
+  color: #f7f4eb !important; /* Elegant warm cream logo */
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
+.logo-sub {
+  color: #a89284 !important; /* Muted tan logo subtext */
+}
+.sidebar-section-label {
+  color: #8a7567 !important; /* Muted brown section titles */
+}
+.nav-item {
+  color: #d7c9bd !important; /* Light tan nav links */
+}
+.nav-item:hover {
+  background: #362319 !important; /* Dark warm brown hover background */
+  color: #ffffff !important;
+}
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.25), rgba(201, 168, 76, 0.08)) !important;
+  color: #c9a84c !important; /* Gold text for active item */
+  border: 1px solid rgba(201, 168, 76, 0.35) !important;
+}
+.sidebar-footer {
+  border-top: 1px solid #362319 !important;
+}
+.admin-avatar:hover {
+  background: #362319 !important;
+}
+.avatar-circle {
+  background: linear-gradient(135deg, #c9a84c, #a88734) !important;
+  color: #251710 !important;
+}
+.avatar-info p {
+  color: #f7f4eb !important;
+}
+.avatar-info span {
+  color: #a89284 !important;
+}
+
+/* Header Leather Theme Customization */
+.header {
+  background: #251710 !important; /* Rich dark espresso leather */
+  border-bottom: 1px solid #362319 !important;
+}
+.header-title {
+  color: #f7f4eb !important; /* Warm cream text */
+}
+.header-breadcrumb {
+  color: #a89284 !important; /* Muted tan breadcrumb */
+}
+.header-search {
+  background: #1d1109 !important; /* Deeper warm dark input bg */
+  border: 1px solid #362319 !important;
+}
+.header-search input {
+  color: #f7f4eb !important;
+}
+.header-search input::placeholder {
+  color: #8a7567 !important;
+}
+.header-search .ti {
+  color: #8a7567 !important;
+}
+.header-actions .icon-btn {
+  background: #1d1109 !important;
+  border: 1px solid #362319 !important;
+  color: #d7c9bd !important;
+}
+.header-actions .icon-btn:hover {
+  background: #362319 !important;
+  color: #ffffff !important;
+}
+.header-actions .notif-dot {
+  border: 2px solid #1d1109 !important;
+}
+
