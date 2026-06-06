@@ -7,6 +7,7 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\UserController as BackUserController;
 use App\Http\Controllers\Backend\ThreadController as BackThreadController;
 use App\Http\Controllers\Backend\AdminController;
+use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Frontend\ProductController;
 
@@ -47,6 +48,12 @@ Route::get('/pages/{slug}', [HomeController::class, 'showPage'])->name('pages.sh
 |--------------------------------------------------------------------------
 */
 Route::prefix('backend')->name('backend.')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+Route::prefix('backend')->name('backend.')->middleware('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     

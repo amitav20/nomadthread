@@ -14,8 +14,18 @@ class ProductImageUploadTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $admin;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \App\Services\DatabaseService::getConnection();
+        $this->admin = \App\Models\User::where('role', 'admin')->first();
+    }
+
     public function test_can_upload_multiple_images_when_creating_product()
     {
+        $this->actingAs($this->admin);
         Storage::fake('public');
 
         $category = Category::create([
@@ -75,6 +85,7 @@ class ProductImageUploadTest extends TestCase
 
     public function test_can_manage_images_when_updating_product()
     {
+        $this->actingAs($this->admin);
         Storage::fake('public');
 
         $category = Category::create([

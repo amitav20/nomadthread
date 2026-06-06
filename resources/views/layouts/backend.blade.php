@@ -92,16 +92,30 @@
                 </h1>
             </div>
             
-            <!-- User Status Info -->
-            <div class="flex items-center gap-3">
-                <div class="text-right">
-                    <div class="text-xs font-semibold text-slate-200">Alex Mercer</div>
-                    <div class="text-[10px] text-teal-400 font-medium">Administrator</div>
+            <!-- User Status Info & Logout -->
+            @if(Auth::check())
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <div class="text-xs font-semibold text-slate-200">{{ Auth::user()->name }}</div>
+                        <div class="text-[10px] text-teal-400 font-medium">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'User' }}</div>
+                    </div>
+                    <div class="h-9 w-9 rounded-full bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-sm font-bold text-teal-300">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                    </div>
                 </div>
-                <div class="h-9 w-9 rounded-full bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-sm font-bold text-teal-300">
-                    AM
-                </div>
+                
+                <form action="{{ route('backend.logout') }}" method="POST" class="inline-block">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-900/50 transition-all duration-300" title="Logout">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
             </div>
+            @endif
         </header>
 
         <!-- Flash messages / Notifications -->

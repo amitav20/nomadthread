@@ -55,11 +55,23 @@
     <a href="{{ route('backend.settings') }}" class="nav-item {{ Route::is('backend.settings') ? 'active' : '' }}"><i class="ti ti-settings"></i> Settings</a>
   </div>
   <div class="sidebar-footer">
-    <div class="admin-avatar">
-      <div class="avatar-circle">AK</div>
-      <div class="avatar-info"><p>Arjun Kumar</p><span>Super Admin</span></div>
-      <i class="ti ti-dots-vertical" style="margin-left:auto;color:var(--text3);font-size:16px;"></i>
+    @if(Auth::check())
+    <div class="admin-avatar" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;">
+        <div class="avatar-circle" style="flex-shrink: 0;">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+        <div class="avatar-info" style="min-width: 0; flex-grow: 1;">
+          <p style="margin: 0; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Auth::user()->name }}</p>
+          <span style="font-size: 11px; color: var(--text3);">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'User' }}</span>
+        </div>
+      </div>
+      <form action="{{ route('backend.logout') }}" method="POST" style="margin: 0; margin-left: auto; display: flex; align-items: center; flex-shrink: 0;">
+        @csrf
+        <button type="submit" style="background: none; border: none; color: var(--text3); cursor: pointer; padding: 4px; display: flex; align-items: center; transition: color 0.2s;" onmouseover="this.style.color='#f43f5e'" onmouseout="this.style.color='var(--text3)'" title="Logout">
+          <i class="ti ti-logout" style="font-size: 18px;"></i>
+        </button>
+      </form>
     </div>
+    @endif
   </div>
 </aside>
 

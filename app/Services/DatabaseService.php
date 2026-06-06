@@ -15,7 +15,7 @@ class DatabaseService
      */
     public static function getConnection()
     {
-        if (self::$initialized) {
+        if (self::$initialized && !app()->runningUnitTests()) {
             return true;
         }
 
@@ -64,6 +64,7 @@ class DatabaseService
                 $table->string('name');
                 $table->string('email')->unique();
                 $table->string('password');
+                $table->string('role')->default('user');
                 $table->timestamp('created_at')->useCurrent();
             });
         }
@@ -93,11 +94,11 @@ class DatabaseService
 
         // Seed users
         $usersData = [
-            ['Alex Mercer (Admin)', 'admin@nomadthread.test', password_hash('password', PASSWORD_DEFAULT)],
-            ['Sophia Martinez', 'sophia@nomad.com', password_hash('password', PASSWORD_DEFAULT)],
-            ['Kai Tanaka', 'kai@nomad.com', password_hash('password', PASSWORD_DEFAULT)],
-            ['Elena Rostova', 'elena@nomad.com', password_hash('password', PASSWORD_DEFAULT)],
-            ['Marcus Vance', 'marcus@nomad.com', password_hash('password', PASSWORD_DEFAULT)],
+            ['Alex Mercer (Admin)', 'admin@nomadthread.test', password_hash('password', PASSWORD_DEFAULT), 'admin'],
+            ['Sophia Martinez', 'sophia@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
+            ['Kai Tanaka', 'kai@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
+            ['Elena Rostova', 'elena@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
+            ['Marcus Vance', 'marcus@nomad.com', password_hash('password', PASSWORD_DEFAULT), 'user'],
         ];
 
         $userIds = [];
@@ -106,6 +107,7 @@ class DatabaseService
                 'name' => $userData[0],
                 'email' => $userData[1],
                 'password' => $userData[2],
+                'role' => $userData[3],
             ]);
         }
 

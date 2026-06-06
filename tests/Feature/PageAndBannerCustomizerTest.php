@@ -13,8 +13,18 @@ class PageAndBannerCustomizerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $admin;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \App\Services\DatabaseService::getConnection();
+        $this->admin = \App\Models\User::where('role', 'admin')->first();
+    }
+
     public function test_can_crud_banners_with_image_and_video()
     {
+        $this->actingAs($this->admin);
         Storage::fake('public');
 
         // 1. Create Banner
@@ -78,6 +88,7 @@ class PageAndBannerCustomizerTest extends TestCase
 
     public function test_can_crud_pages_with_featured_image()
     {
+        $this->actingAs($this->admin);
         Storage::fake('public');
 
         // 1. Create Page
@@ -165,6 +176,7 @@ class PageAndBannerCustomizerTest extends TestCase
 
     public function test_admin_can_update_settings_and_renders_dynamically_in_frontend()
     {
+        $this->actingAs($this->admin);
         // 1. Post to update settings
         $response = $this->post(route('backend.settings.update'), [
             'store_name' => 'Custom Leather Store',
