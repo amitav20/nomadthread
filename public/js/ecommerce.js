@@ -16,27 +16,39 @@ function renderProducts(filter = 'all') {
   const grid = document.getElementById('productGrid');
   if (!grid) return; // Exit if not on the store index page
   const filtered = filter === 'all' ? products : products.filter(p => p.category_slug === filter || (filter === 'new' && p.badge === 'new'));
-  grid.innerHTML = filtered.map(p => `
+  
+  const getProductUrl = (sku) => {
+    const template = window.routes?.productShow || '/product/PLACEHOLDER';
+    return template.replace('PLACEHOLDER', sku);
+  };
+
+  grid.innerHTML = filtered.map(p => {
+    const firstColor = p.colors[0] || 'tan';
+    return `
     <div class="product-card" data-id="${p.id}">
       <div class="product-img-wrap">
         ${p.badge ? `<div class="product-badge ${p.badge === 'new' ? 'badge-new' : 'badge-sale'}">${p.badge === 'new' ? 'New' : 'Sale'}</div>` : ''}
         <button class="product-wishlist" onclick="toggleWishlist(this)" title="Wishlist">♡</button>
         <div class="product-thumb">
-          ${p.images && p.images.length > 0 
-            ? `<img src="${p.images[0].image_path}" alt="${p.images[0].alt_text || p.name}" style="width:100%; height:100%; object-fit:cover;" id="thumb-${p.id}">`
-            : `<div class="product-visual ${p.shape} ${getColorClass(p.colors[0])}" data-product="${p.id}" id="thumb-${p.id}"></div>`
-          }
+          <a href="${getProductUrl(p.sku)}" style="display:block; width:100%; height:100%">
+            ${p.images && p.images.length > 0 
+              ? `<img src="${p.images[0].image_path}" alt="${p.images[0].alt_text || p.name}" style="width:100%; height:100%; object-fit:cover;" id="thumb-${p.id}">`
+              : `<div class="product-visual ${p.shape || 'bag-shape'} ${getColorClass(firstColor)}" data-product="${p.id}" id="thumb-${p.id}"></div>`
+            }
+          </a>
         </div>
         <div class="product-add-overlay">
-          <button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
-          <button class="quick-view-btn" onclick="openModal(${p.id})">View</button>
+          <button class="add-cart-btn" onclick="addToCart(${p.id}, '${firstColor}')">Add to Cart</button>
+          <button class="quick-view-btn" onclick="openModal(${p.id})">Quick View</button>
         </div>
       </div>
       <div class="product-info">
         <div class="color-swatches">
-          ${p.colors.map((c,i) => `<div class="swatch swatch-${c} ${i===0?'active':''}" onclick="changeColor(${p.id}, '${c}', this)" title="${c.charAt(0).toUpperCase()+c.slice(1)}"></div>`).join('')}
+          ${p.colors.map((c,i) => `<div class="swatch swatch-${c.trim()} ${i===0?'active':''}" onclick="changeColor(${p.id}, '${c.trim()}', this)" title="${c.trim().charAt(0).toUpperCase()+c.trim().slice(1)}"></div>`).join('')}
         </div>
-        <div class="product-name">${p.name}</div>
+        <div class="product-name">
+          <a href="${getProductUrl(p.sku)}" style="color:inherit; text-decoration:none">${p.name}</a>
+        </div>
         <div class="product-type">${p.type}</div>
         <div class="product-price">
           <span class="price-current">${formatPrice(p.price)}</span>
@@ -44,7 +56,8 @@ function renderProducts(filter = 'all') {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function filterProducts(cat, btn) {
@@ -360,7 +373,8 @@ window.addEventListener('scroll', () => {
 // ─── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const res = await fetch('/api/products');
+    const apiUrl = window.routes?.apiProducts || '/api/products';
+    const res = await fetch(apiUrl);
     const json = await res.json();
     products = json.data || [];
   } catch (err) {
@@ -368,7 +382,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
   const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-category') : 'all';
-  renderProducts(activeFilter);
+  const grid = document.getElementById('productGrid');
+  if (grid && grid.children.length === 0) {
+    renderProducts(activeFilter);
+  }
   updateCartUI();
   if (window.bindCursorExpands) window.bindCursorExpands();
   setTimeout(() => window.dispatchEvent(new Event('scroll')), 100);

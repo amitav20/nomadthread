@@ -695,8 +695,18 @@ class AdminController extends Controller
     public function settingsUpdate(Request $request)
     {
         $data = $request->except('_token');
+
+        if ($request->hasFile('logo_image')) {
+            $file = $request->file('logo_image');
+            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('branding', $filename, 'public');
+            $data['logo_image'] = '/uploads/' . $path;
+        }
+
         foreach ($data as $key => $value) {
-            \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            if ($value !== null) {
+                \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            }
         }
         return redirect()->route('backend.settings')->with('success', 'Settings updated successfully.');
     }

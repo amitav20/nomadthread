@@ -76,7 +76,7 @@
             </div>
             <div class="product-add-overlay">
               <button class="add-cart-btn" onclick="addToCart({{ $p['id'] }}, '{{ $firstColor }}')">Add to Cart</button>
-              <a href="{{ route('shop.product', $p['sku']) }}" class="quick-view-btn" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center">View Details</a>
+              <button class="quick-view-btn" onclick="openModal({{ $p['id'] }})">Quick View</button>
             </div>
           </div>
           <div class="product-info">

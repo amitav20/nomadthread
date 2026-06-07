@@ -11,7 +11,7 @@
   </div>
 @endif
 
-<form action="{{ route('backend.settings.update') }}" method="POST">
+<form action="{{ route('backend.settings.update') }}" method="POST" enctype="multipart/form-data">
   @csrf
 
   <div class="page-header">
@@ -86,6 +86,15 @@
           <div class="form-group">
             <label class="form-label">Logo Header Text</label>
             <input type="text" name="logo_text" class="form-input" value="{{ old('logo_text', $settings['logo_text'] ?? '') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Logo Image (PNG/JPG/SVG)</label>
+            @if(!empty($settings['logo_image']))
+              <div style="margin-bottom: 10px;">
+                <img src="{{ asset($settings['logo_image']) }}" alt="Current Logo" style="height: 50px; background: #eee; padding: 5px; border-radius: 4px; object-fit: contain;">
+              </div>
+            @endif
+            <input type="file" name="logo_image" class="form-input">
           </div>
           <div class="form-group">
             <label class="form-label">Top Bar Announcement Text (HTML Allowed)</label>

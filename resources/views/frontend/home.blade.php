@@ -182,9 +182,13 @@
     @php
       $bgMap = [
         'bags' => 'bg-bags',
+        'bag' => 'bg-bags',
         'wallets' => 'bg-wallets',
+        'wallet' => 'bg-wallets',
         'accessories' => 'bg-belts',
-        'travel' => 'bg-luggage'
+        'accessory' => 'bg-belts',
+        'travel' => 'bg-luggage',
+        'travels' => 'bg-luggage'
       ];
     @endphp
     <div class="cat-grid reveal">
@@ -214,10 +218,9 @@
 
     <div class="filter-bar reveal">
       <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
-      <button class="filter-btn" onclick="filterProducts('bags', this)">Bags</button>
-      <button class="filter-btn" onclick="filterProducts('wallets', this)">Wallets</button>
-      <button class="filter-btn" onclick="filterProducts('accessories', this)">Accessories</button>
-      <button class="filter-btn" onclick="filterProducts('travel', this)">Travel</button>
+      @foreach($categories as $cat)
+        <button class="filter-btn" onclick="filterProducts('{{ $cat['slug'] }}', this)">{{ $cat['name'] }}</button>
+      @endforeach
       <button class="filter-btn" onclick="filterProducts('new', this)">New Arrivals</button>
     </div>
 

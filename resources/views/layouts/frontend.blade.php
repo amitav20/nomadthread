@@ -11,6 +11,19 @@
   
   <!-- Premium Artisan Stylesheet -->
   <link href="{{ asset('css/ecommerce.css') }}" rel="stylesheet" />
+
+  <style>
+    .mega-menu {
+      z-index: 1100;
+    }
+  </style>
+
+  <script>
+    window.routes = {
+      apiProducts: "{{ route('api.products') }}",
+      productShow: "{{ route('shop.product', ['sku' => 'PLACEHOLDER']) }}"
+    };
+  </script>
 </head>
 <body>
 
@@ -84,34 +97,22 @@
   <!-- HEADER -->
   <header>
     <div class="header-inner">
-      <a href="{{ route('home') }}" class="logo">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</a>
+      <a href="{{ route('home') }}" class="logo-wrap" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none;">
+        @if(!empty($siteSettings['logo_image']))
+          <img src="{{ asset($siteSettings['logo_image']) }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px;">
+        @else
+          <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px;">
+        @endif
+        <span class="logo" style="color: #dfc049;">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
+      </a>
       <nav>
         <a href="{{ route('home') }}" class="nav-item {{ Route::is('home') ? 'active' : '' }}">Home</a>
-        <a href="{{ route('shop.index') }}" class="nav-item {{ Route::is('shop.index') ? 'active' : '' }}">Shop</a>
-        <div class="has-mega">
-          <span class="nav-item" style="cursor:pointer">Categories ▾</span>
-          <div class="mega-menu">
-            <div class="mega-col">
-              <h4>Browse Categories</h4>
-              @foreach($sharedCategories as $cat)
-                <a href="{{ route('shop.category', $cat->slug) }}">{{ $cat->name }}</a>
-              @endforeach
-            </div>
-            <div class="mega-col">
-              <h4>Collections</h4>
-              <a href="{{ route('shop.index') }}?new=1">New Arrivals</a>
-              <a href="{{ route('shop.index') }}">Bestsellers</a>
-            </div>
-            @if($sharedPages->where('show_in_navigation', true)->isNotEmpty())
-              <div class="mega-col">
-                <h4>Information</h4>
-                @foreach($sharedPages->where('show_in_navigation', true) as $p)
-                  <a href="{{ route('pages.show', $p->slug) }}">{{ $p->title }}</a>
-                @endforeach
-              </div>
-            @endif
-          </div>
-        </div>
+        <a href="{{ route('shop.index') }}" class="nav-item {{ Route::is('shop.index') && !Request::routeIs('shop.category') ? 'active' : '' }}">Shop</a>
+        
+        @foreach($sharedCategories as $cat)
+          <a href="{{ route('shop.category', $cat->slug) }}" class="nav-item {{ Request::is('category/' . $cat->slug) ? 'active' : '' }}">{{ $cat->name }}</a>
+        @endforeach
+
         <a href="{{ Route::is('home') ? '#about' : route('home').'#about' }}" class="nav-item">Our Craft</a>
         <a href="{{ route('threads.index') }}" class="nav-item {{ Route::is('threads.*') ? 'active' : '' }}">Discussions</a>
       </nav>
@@ -136,7 +137,14 @@
   <footer>
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="{{ route('home') }}" class="logo" style="color:var(--cream)">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</a>
+        <a href="{{ route('home') }}" class="logo-wrap" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none;">
+          @if(!empty($siteSettings['logo_image']))
+            <img src="{{ asset($siteSettings['logo_image']) }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px; filter: brightness(1.2);">
+          @else
+            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px; filter: brightness(1.2);">
+          @endif
+          <span class="logo" style="color: var(--cream);">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
+        </a>
         <p class="footer-tagline">{{ $siteSettings['footer_tagline'] ?? 'Artisan leather goods handcrafted in India, built to last a lifetime and grow more beautiful with every use.' }}</p>
         <div class="footer-social">
           <a href="{{ $siteSettings['facebook_link'] ?? '#' }}" class="social-link" target="_blank">f</a>
