@@ -117,7 +117,7 @@ class AdminController extends Controller
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => '/storage/' . $path,
+                    'image_path' => '/uploads/' . $path,
                     'alt_text' => $product->name,
                     'is_primary' => ($index === 0),
                     'sort_order' => $index,
@@ -184,7 +184,7 @@ class AdminController extends Controller
             foreach ($request->input('delete_images') as $imgId) {
                 $img = ProductImage::where('product_id', $product->id)->find($imgId);
                 if ($img) {
-                    $relativePath = str_replace('/storage/', '', $img->image_path);
+                    $relativePath = str_replace('/uploads/', '', $img->image_path);
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
                     $img->delete();
                 }
@@ -231,7 +231,7 @@ class AdminController extends Controller
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => '/storage/' . $path,
+                    'image_path' => '/uploads/' . $path,
                     'alt_text' => $product->name,
                     'is_primary' => (!$hasPrimary && $index === 0),
                     'sort_order' => ProductImage::where('product_id', $product->id)->max('sort_order') + 1,
@@ -385,7 +385,7 @@ class AdminController extends Controller
             $file = $request->file('image');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $imagePath = '/storage/' . $path;
+            $imagePath = '/uploads/' . $path;
         }
 
         $videoPath = null;
@@ -393,7 +393,7 @@ class AdminController extends Controller
             $file = $request->file('video');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $videoPath = '/storage/' . $path;
+            $videoPath = '/uploads/' . $path;
         }
 
         $imageMobilePath = null;
@@ -401,7 +401,7 @@ class AdminController extends Controller
             $file = $request->file('image_mobile');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $imageMobilePath = '/storage/' . $path;
+            $imageMobilePath = '/uploads/' . $path;
         }
 
         Banner::create([
@@ -458,30 +458,30 @@ class AdminController extends Controller
         $imagePath = $banner->image;
         if ($request->hasFile('image')) {
             if (!empty($banner->image)) {
-                $oldPath = str_replace('/storage/', '', $banner->image);
+                $oldPath = str_replace('/uploads/', '', $banner->image);
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $file = $request->file('image');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $imagePath = '/storage/' . $path;
+            $imagePath = '/uploads/' . $path;
         }
 
         $videoPath = $banner->video;
         if ($request->hasFile('video')) {
             if (!empty($banner->video)) {
-                $oldPath = str_replace('/storage/', '', $banner->video);
+                $oldPath = str_replace('/uploads/', '', $banner->video);
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $file = $request->file('video');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $videoPath = '/storage/' . $path;
+            $videoPath = '/uploads/' . $path;
         }
 
         if ($request->has('delete_video') && $request->delete_video == 1) {
             if (!empty($banner->video)) {
-                $oldPath = str_replace('/storage/', '', $banner->video);
+                $oldPath = str_replace('/uploads/', '', $banner->video);
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $videoPath = null;
@@ -490,13 +490,13 @@ class AdminController extends Controller
         $imageMobilePath = $banner->image_mobile;
         if ($request->hasFile('image_mobile')) {
             if (!empty($banner->image_mobile)) {
-                $oldPath = str_replace('/storage/', '', $banner->image_mobile);
+                $oldPath = str_replace('/uploads/', '', $banner->image_mobile);
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $file = $request->file('image_mobile');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('banners', $filename, 'public');
-            $imageMobilePath = '/storage/' . $path;
+            $imageMobilePath = '/uploads/' . $path;
         }
 
         $banner->update([
@@ -528,15 +528,15 @@ class AdminController extends Controller
         $banner = Banner::findOrFail($id);
         
         if (!empty($banner->image)) {
-            $oldPath = str_replace('/storage/', '', $banner->image);
+            $oldPath = str_replace('/uploads/', '', $banner->image);
             \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
         if (!empty($banner->video)) {
-            $oldPath = str_replace('/storage/', '', $banner->video);
+            $oldPath = str_replace('/uploads/', '', $banner->video);
             \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
         if (!empty($banner->image_mobile)) {
-            $oldPath = str_replace('/storage/', '', $banner->image_mobile);
+            $oldPath = str_replace('/uploads/', '', $banner->image_mobile);
             \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
 
@@ -582,7 +582,7 @@ class AdminController extends Controller
             $file = $request->file('featured_image');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('pages', $filename, 'public');
-            $featuredImagePath = '/storage/' . $path;
+            $featuredImagePath = '/uploads/' . $path;
         }
 
         Page::create([
@@ -633,13 +633,13 @@ class AdminController extends Controller
         $featuredImagePath = $page->featured_image;
         if ($request->hasFile('featured_image')) {
             if (!empty($page->featured_image)) {
-                $oldPath = str_replace('/storage/', '', $page->featured_image);
+                $oldPath = str_replace('/uploads/', '', $page->featured_image);
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $file = $request->file('featured_image');
             $filename = md5(uniqid() . time()) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('pages', $filename, 'public');
-            $featuredImagePath = '/storage/' . $path;
+            $featuredImagePath = '/uploads/' . $path;
         }
 
         $page->update([
@@ -668,7 +668,7 @@ class AdminController extends Controller
         $page = Page::findOrFail($id);
         
         if (!empty($page->featured_image)) {
-            $oldPath = str_replace('/storage/', '', $page->featured_image);
+            $oldPath = str_replace('/uploads/', '', $page->featured_image);
             \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
 

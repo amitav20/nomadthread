@@ -52,8 +52,8 @@ class PageAndBannerCustomizerTest extends TestCase
         $this->assertEquals('Luxury Leather Co.', $banner->headline);
 
         // Verify storage paths
-        $imageRelative = str_replace('/storage/', '', $banner->image);
-        $videoRelative = str_replace('/storage/', '', $banner->video);
+        $imageRelative = str_replace('/uploads/', '', $banner->image);
+        $videoRelative = str_replace('/uploads/', '', $banner->video);
         Storage::disk('public')->assertExists($imageRelative);
         Storage::disk('public')->assertExists($videoRelative);
 
@@ -75,7 +75,7 @@ class PageAndBannerCustomizerTest extends TestCase
 
         // Check old video deleted and new video created
         Storage::disk('public')->assertMissing($videoRelative);
-        $newVideoRelative = str_replace('/storage/', '', $banner->video);
+        $newVideoRelative = str_replace('/uploads/', '', $banner->video);
         Storage::disk('public')->assertExists($newVideoRelative);
 
         // 3. Destroy Banner
@@ -117,7 +117,7 @@ class PageAndBannerCustomizerTest extends TestCase
         $this->assertEquals('With Sidebar', $page->template);
         $this->assertTrue((bool)$page->show_in_navigation);
 
-        $imageRelative = str_replace('/storage/', '', $page->featured_image);
+        $imageRelative = str_replace('/uploads/', '', $page->featured_image);
         Storage::disk('public')->assertExists($imageRelative);
 
         // 2. Edit / Update Page
@@ -160,8 +160,8 @@ class PageAndBannerCustomizerTest extends TestCase
         $banner = Banner::create([
             'title' => 'Terms Page Banner',
             'position' => 'terms',
-            'image' => '/storage/banners/terms.jpg',
-            'video' => '/storage/banners/terms.mp4',
+            'image' => '/uploads/banners/terms.jpg',
+            'video' => '/uploads/banners/terms.mp4',
             'status' => 'active',
             'sort_order' => 1,
         ]);

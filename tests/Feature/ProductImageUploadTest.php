@@ -70,7 +70,7 @@ class ProductImageUploadTest extends TestCase
         $this->assertEquals($product->name, $firstImage->alt_text);
 
         // Check storage
-        $path1 = str_replace('/storage/', '', $firstImage->image_path);
+        $path1 = str_replace('/uploads/', '', $firstImage->image_path);
         Storage::disk('public')->assertExists($path1);
 
         $secondImage = $product->images->firstWhere('is_primary', false);
@@ -79,7 +79,7 @@ class ProductImageUploadTest extends TestCase
         $this->assertEquals(800, $secondImage->height);
         $this->assertEquals('image/png', $secondImage->mime_type);
 
-        $path2 = str_replace('/storage/', '', $secondImage->image_path);
+        $path2 = str_replace('/uploads/', '', $secondImage->image_path);
         Storage::disk('public')->assertExists($path2);
     }
 
@@ -110,7 +110,7 @@ class ProductImageUploadTest extends TestCase
 
         $img = ProductImage::create([
             'product_id' => $product->id,
-            'image_path' => '/storage/' . $path,
+            'image_path' => '/uploads/' . $path,
             'alt_text' => 'Old Alt',
             'is_primary' => true,
             'sort_order' => 0,
@@ -172,7 +172,7 @@ class ProductImageUploadTest extends TestCase
 
         ProductImage::create([
             'product_id' => $product->id,
-            'image_path' => '/storage/products/1/img1.jpg',
+            'image_path' => '/uploads/products/1/img1.jpg',
             'alt_text' => 'Bag Alt',
             'is_primary' => true,
             'sort_order' => 0,
@@ -186,7 +186,7 @@ class ProductImageUploadTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
-            'image_path' => '/storage/products/1/img1.jpg',
+            'image_path' => '/uploads/products/1/img1.jpg',
             'alt_text' => 'Bag Alt',
         ]);
     }
