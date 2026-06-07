@@ -11,10 +11,10 @@
   <section class="page-hero-section" style="padding: 120px 0 60px; background: var(--espresso); position: relative; overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center; text-align: center;">
     @if(!empty($shopBanner['video']))
       <video autoplay loop muted playsinline style="position: absolute; inset: 0; width:100%; height:100%; object-fit:cover; opacity: 0.4;">
-        <source src="{{ $shopBanner['video'] }}" type="video/mp4">
+        <source src="{{ asset($shopBanner['video']) }}" type="video/mp4">
       </video>
     @elseif(!empty($shopBanner['image']))
-      <div style="position: absolute; inset:0; background-image: url('{{ $shopBanner['image'] }}'); background-size: cover; background-position: center; opacity: 0.4;"></div>
+      <div style="position: absolute; inset:0; background-image: url('{{ asset($shopBanner['image']) }}'); background-size: cover; background-position: center; opacity: 0.4;"></div>
     @endif
     <div style="position: absolute; inset:0; background: linear-gradient(to bottom, rgba(44,26,14,0.6), rgba(44,26,14,0.85)); z-index:1;"></div>
     <div class="section-inner" style="position: relative; z-index: 2;">
@@ -68,7 +68,7 @@
             <div class="product-thumb">
               <a href="{{ route('shop.product', $p['sku']) }}" style="display:block; width:100%; height:100%">
                 @if(!empty($p['images']))
-                  <img src="{{ $p['images'][0]['image_path'] }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" style="width:100%; height:100%; object-fit:cover;" id="thumb-{{ $p['id'] }}">
+                  <img src="{{ asset($p['images'][0]['image_path']) }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" style="width:100%; height:100%; object-fit:cover;" id="thumb-{{ $p['id'] }}">
                 @else
                   <div class="product-visual {{ $p['shape'] ?? 'bag-shape' }} color-{{ $firstColor }}" data-product="{{ $p['id'] }}" id="thumb-{{ $p['id'] }}"></div>
                 @endif

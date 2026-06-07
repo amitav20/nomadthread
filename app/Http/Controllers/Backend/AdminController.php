@@ -31,7 +31,7 @@ class AdminController extends Controller
         }
 
         $recentOrders = Order::orderBy('created_at', 'desc')->limit(5)->get();
-        $recentProducts = Product::with('category')->orderBy('created_at', 'desc')->limit(5)->get();
+        $recentProducts = Product::with(['category', 'images'])->orderBy('created_at', 'desc')->limit(5)->get();
 
         return view('backend.admin.dashboard', compact(
             'productsCount',
@@ -54,7 +54,7 @@ class AdminController extends Controller
 
     public function productsIndex()
     {
-        $products = Product::with('category')->orderBy('id', 'desc')->get();
+        $products = Product::with(['category', 'images'])->orderBy('id', 'desc')->get();
         return view('backend.admin.products.index', compact('products'));
     }
 

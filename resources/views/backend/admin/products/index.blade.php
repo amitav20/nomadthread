@@ -34,11 +34,14 @@
           <td>
             <div class="product-info">
               <div class="product-thumb" style="display:flex; align-items:center; justify-content:center;">
-                @php
-                  $colorsList = explode(',', $p->colors ?? '');
-                  $firstColor = trim($colorsList[0] ?? 'tan');
-                @endphp
-                <div class="product-visual {{ $p->shape }}" style="transform: scale(0.35); width: 80px; height: 80px; flex-shrink: 0; background-color: transparent;"></div>
+                @if($p->images && $p->images->count() > 0)
+                  @php
+                    $primaryImg = $p->images->firstWhere('is_primary', true) ?? $p->images->first();
+                  @endphp
+                  <img src="{{ asset($primaryImg->image_path) }}" alt="{{ $p->name }}">
+                @else
+                  <div class="product-visual {{ $p->shape }}" style="transform: scale(0.35); width: 80px; height: 80px; flex-shrink: 0; background-color: transparent;"></div>
+                @endif
               </div>
               <div>
                 <div class="product-name">{{ $p->name }}</div>
