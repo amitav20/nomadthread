@@ -15,7 +15,7 @@ function formatPrice(p) { return '₹' + p.toLocaleString('en-IN'); }
 function renderProducts(filter = 'all') {
   const grid = document.getElementById('productGrid');
   if (!grid) return; // Exit if not on the store index page
-  const filtered = filter === 'all' ? products : products.filter(p => p.category === filter || (filter === 'new' && p.badge === 'new'));
+  const filtered = filter === 'all' ? products : products.filter(p => p.category_slug === filter || (filter === 'new' && p.badge === 'new'));
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" data-id="${p.id}">
       <div class="product-img-wrap">
@@ -366,7 +366,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('Failed to fetch products:', err);
   }
-  renderProducts();
+  const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
+  const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-category') : 'all';
+  renderProducts(activeFilter);
   updateCartUI();
   if (window.bindCursorExpands) window.bindCursorExpands();
   setTimeout(() => window.dispatchEvent(new Event('scroll')), 100);

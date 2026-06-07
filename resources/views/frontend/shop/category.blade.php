@@ -49,9 +49,9 @@
 
     <!-- Category Filter Bar -->
     <div class="filter-bar reveal visible" style="margin-bottom: 40px; justify-content: center; display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="{{ route('shop.index') }}" class="filter-btn" style="text-decoration:none">All</a>
+      <a href="{{ route('shop.index') }}" class="filter-btn" style="text-decoration:none" data-category="all">All</a>
       @foreach($categories as $cat)
-        <a href="{{ route('shop.category', $cat['slug']) }}" class="filter-btn {{ $currentCategory['slug'] === $cat['slug'] ? 'active' : '' }}" style="text-decoration:none">
+        <a href="{{ route('shop.category', $cat['slug']) }}" class="filter-btn {{ $currentCategory['slug'] === $cat['slug'] ? 'active' : '' }}" style="text-decoration:none" data-category="{{ $cat['slug'] }}">
           {{ $cat['name'] }}
         </a>
       @endforeach
