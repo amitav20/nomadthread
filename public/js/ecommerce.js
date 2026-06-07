@@ -152,6 +152,9 @@ function closeCart() {
 }
 
 // ─── MODAL ─────────────────────────────────────────────
+let modalCurrentImageIndex = 0;
+let modalImageUrls = [];
+
 function openModal(productId) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
@@ -162,12 +165,49 @@ function openModal(productId) {
   document.getElementById('modalPrice').textContent = formatPrice(p.price);
   document.getElementById('modalDesc').textContent = p.description || p.desc || 'Premium full-grain leather, hand-stitched by skilled artisans using traditional techniques. Each piece develops a unique patina over time.';
   document.getElementById('modalAddPrice').textContent = formatPrice(p.price);
-  const vis = document.getElementById('modalVisual');
+  
+  const mainContainer = document.getElementById('modalMainContainer');
+  const thumbsContainer = document.getElementById('modalProductThumbs');
+  
+  modalCurrentImageIndex = 0;
+  modalImageUrls = [];
+
   if (p.images && p.images.length > 0) {
-    vis.outerHTML = `<img src="${p.images[0].image_path}" class="modal-img-visual" id="modalVisual" style="max-width:100%; max-height:300px; object-fit:contain; border-radius:8px;">`;
+    modalImageUrls = p.images.map(img => img.image_path);
+    
+    // Render main image
+    let html = `<img src="${modalImageUrls[0]}" class="modal-img-visual" id="modalVisual" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; transition: opacity 0.3s ease;">`;
+    
+    // Render arrows if more than 1 image
+    if (modalImageUrls.length > 1) {
+      html += `
+        <!-- Left Arrow -->
+        <button onclick="navigateModalImage(-1)" class="modal-nav-arrow" style="position: absolute; left: 0px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 14px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
+          &#10094;
+        </button>
+        <!-- Right Arrow -->
+        <button onclick="navigateModalImage(1)" class="modal-nav-arrow" style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 14px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
+          &#10095;
+        </button>
+      `;
+    }
+    mainContainer.innerHTML = html;
+    
+    // Render thumbnails
+    if (modalImageUrls.length > 1) {
+      thumbsContainer.innerHTML = p.images.map((img, index) => `
+        <div onclick="changeModalImage('${img.image_path}', ${index}, this)" class="modal-thumb-item ${index === 0 ? 'active' : ''}" style="width: 50px; height: 50px; border: 1px solid ${index === 0 ? 'var(--gold)' : 'var(--border)'}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s; border-radius: 4px;">
+          <img src="${img.image_path}" alt="${img.alt_text || p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      `).join('');
+    } else {
+      thumbsContainer.innerHTML = '';
+    }
   } else {
-    vis.outerHTML = `<div class="product-visual modal-img-visual ${p.shape || ''} ${getColorClass(p.colors[0])}" id="modalVisual"></div>`;
+    mainContainer.innerHTML = `<div class="product-visual modal-img-visual ${p.shape || ''} ${getColorClass(p.colors[0])}" id="modalVisual"></div>`;
+    thumbsContainer.innerHTML = '';
   }
+
   const colorsDiv = document.getElementById('modalColors');
   colorsDiv.innerHTML = p.colors.map((c, i) => `
     <div class="color-opt ${i===0?'active':''}" onclick="selectModalColor('${c}', this, ${p.id})">
@@ -179,6 +219,7 @@ function openModal(productId) {
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function selectModalColor(colorName, el, productId) {
   currentModalColor = colorName;
   el.closest('.color-options').querySelectorAll('.color-opt').forEach(c => c.classList.remove('active'));
@@ -189,6 +230,59 @@ function selectModalColor(colorName, el, productId) {
     vis.className = `product-visual modal-img-visual ${p.shape || ''} ${getColorClass(colorName)}`;
   }
 }
+
+function changeModalImage(src, index, el) {
+  modalCurrentImageIndex = index;
+  const mainImg = document.getElementById('modalVisual');
+  if (mainImg && mainImg.tagName === 'IMG') {
+    mainImg.style.opacity = 0;
+    setTimeout(() => {
+      mainImg.src = src;
+      mainImg.style.opacity = 1;
+    }, 150);
+  }
+  
+  document.querySelectorAll('.modal-thumb-item').forEach(item => {
+    item.style.borderColor = 'var(--border)';
+    item.classList.remove('active');
+  });
+  el.style.borderColor = 'var(--gold)';
+  el.classList.add('active');
+}
+
+function navigateModalImage(direction) {
+  if (!modalImageUrls || modalImageUrls.length <= 1) return;
+  
+  modalCurrentImageIndex += direction;
+  if (modalCurrentImageIndex < 0) {
+    modalCurrentImageIndex = modalImageUrls.length - 1;
+  } else if (modalCurrentImageIndex >= modalImageUrls.length) {
+    modalCurrentImageIndex = 0;
+  }
+  
+  const nextSrc = modalImageUrls[modalCurrentImageIndex];
+  const mainImg = document.getElementById('modalVisual');
+  if (mainImg && mainImg.tagName === 'IMG') {
+    mainImg.style.opacity = 0;
+    setTimeout(() => {
+      mainImg.src = nextSrc;
+      mainImg.style.opacity = 1;
+    }, 150);
+  }
+  
+  // Update thumbnail highlights
+  const thumbs = document.querySelectorAll('.modal-thumb-item');
+  thumbs.forEach((item, idx) => {
+    if (idx === modalCurrentImageIndex) {
+      item.style.borderColor = 'var(--gold)';
+      item.classList.add('active');
+    } else {
+      item.style.borderColor = 'var(--border)';
+      item.classList.remove('active');
+    }
+  });
+}
+
 function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
 function closeModalDirect() {
   document.getElementById('modalOverlay').classList.remove('open');

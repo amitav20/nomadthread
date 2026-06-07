@@ -43,9 +43,12 @@
   <!-- PRODUCT QUICK VIEW MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal" id="modalContent">
-      <div class="modal-img">
-        <button class="modal-close" onclick="closeModalDirect()">✕</button>
-        <div class="product-visual modal-img-visual" id="modalVisual"></div>
+      <div class="modal-img" style="display: flex; flex-direction: column; gap: 20px; padding: 40px; min-height: 460px; justify-content: center; align-items: center;">
+        <button class="modal-close" onclick="closeModalDirect()" style="z-index:20;">✕</button>
+        <div id="modalMainContainer" style="position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px;">
+          <div class="product-visual modal-img-visual" id="modalVisual"></div>
+        </div>
+        <div id="modalProductThumbs" style="display: flex; gap: 8px; overflow-x: auto; width: 100%; justify-content: center; z-index: 10;"></div>
       </div>
       <div class="modal-detail">
         <div class="product-type" id="modalType">Leather Bags</div>
