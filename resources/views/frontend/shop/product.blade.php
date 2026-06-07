@@ -13,21 +13,39 @@
     @php
       $colorsList = is_array($product['colors']) ? $product['colors'] : explode(',', $product['colors'] ?? '');
       $firstColor = $colorsList[0] ?? 'tan';
+      
+      $imageUrls = [];
+      if(!empty($product['images'])) {
+        foreach($product['images'] as $img) {
+          $imageUrls[] = asset($img['image_path']);
+        }
+      }
     @endphp
 
     <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: start;">
       
       <!-- Product Image / Visual Showcase -->
       <div style="display: flex; flex-direction: column; gap: 20px;">
-        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: center; position: relative; min-height: 400px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: center; position: relative; min-height: 400px; overflow: hidden;">
           @if(!empty($product['badge']))
-            <div class="product-badge {{ $product['badge'] === 'new' ? 'badge-new' : 'badge-sale' }}" style="position: absolute; top: 20px; left: 20px;">
+            <div class="product-badge {{ $product['badge'] === 'new' ? 'badge-new' : 'badge-sale' }}" style="position: absolute; top: 20px; left: 20px; z-index: 10;">
               {{ ucfirst($product['badge']) }}
             </div>
           @endif
           
           @if(!empty($product['images']))
             <img src="{{ asset($product['images'][0]['image_path']) }}" alt="{{ $product['images'][0]['alt_text'] ?? $product['name'] }}" id="productMainImage" style="max-width: 100%; max-height: 380px; object-fit: contain; transition: opacity 0.3s ease;">
+            
+            @if(count($product['images']) > 1)
+              <!-- Left Arrow -->
+              <button onclick="navigateImage(-1)" class="nav-arrow prev-arrow" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 18px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
+                &#10094;
+              </button>
+              <!-- Right Arrow -->
+              <button onclick="navigateImage(1)" class="nav-arrow next-arrow" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 18px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
+                &#10095;
+              </button>
+            @endif
           @else
             <div class="product-visual {{ $product['shape'] ?? 'bag-shape' }} color-{{ $firstColor }}" id="productVisual" style="width: 320px; height: 320px; transition: all 0.5s;"></div>
           @endif
@@ -36,7 +54,7 @@
         @if(!empty($product['images']) && count($product['images']) > 1)
           <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;">
             @foreach($product['images'] as $index => $img)
-              <div onclick="changeDetailImage('{{ asset($img['image_path']) }}', this)" class="detail-thumb-item {{ $index === 0 ? 'active' : '' }}" style="width: 70px; height: 70px; border: 1px solid {{ $index === 0 ? 'var(--gold)' : 'var(--border)' }}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s;">
+              <div onclick="changeDetailImage('{{ asset($img['image_path']) }}', this, {{ $index }})" class="detail-thumb-item {{ $index === 0 ? 'active' : '' }}" style="width: 70px; height: 70px; border: 1px solid {{ $index === 0 ? 'var(--gold)' : 'var(--border)' }}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s;">
                 <img src="{{ asset($img['image_path']) }}" alt="{{ $img['alt_text'] ?? $product['name'] }}" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
             @endforeach
@@ -144,7 +162,11 @@
     visual.className = `product-visual ${shapeClass} color-${colorName}`;
   }
 
-  function changeDetailImage(src, el) {
+  let currentImageIndex = 0;
+  const imageUrls = @json($imageUrls);
+
+  function changeDetailImage(src, el, index) {
+    currentImageIndex = index;
     const mainImg = document.getElementById('productMainImage');
     if (mainImg) {
       mainImg.style.opacity = 0;
@@ -156,8 +178,43 @@
     
     document.querySelectorAll('.detail-thumb-item').forEach(item => {
       item.style.borderColor = 'var(--border)';
+      item.classList.remove('active');
     });
     el.style.borderColor = 'var(--gold)';
+    el.classList.add('active');
+  }
+
+  function navigateImage(direction) {
+    if (!imageUrls || imageUrls.length <= 1) return;
+    
+    currentImageIndex += direction;
+    if (currentImageIndex < 0) {
+      currentImageIndex = imageUrls.length - 1;
+    } else if (currentImageIndex >= imageUrls.length) {
+      currentImageIndex = 0;
+    }
+    
+    const nextSrc = imageUrls[currentImageIndex];
+    const mainImg = document.getElementById('productMainImage');
+    if (mainImg) {
+      mainImg.style.opacity = 0;
+      setTimeout(() => {
+        mainImg.src = nextSrc;
+        mainImg.style.opacity = 1;
+      }, 150);
+    }
+    
+    // Update thumbnail highlights
+    const thumbs = document.querySelectorAll('.detail-thumb-item');
+    thumbs.forEach((item, idx) => {
+      if (idx === currentImageIndex) {
+        item.style.borderColor = 'var(--gold)';
+        item.classList.add('active');
+      } else {
+        item.style.borderColor = 'var(--border)';
+        item.classList.remove('active');
+      }
+    });
   }
 
   function addPageProductToCart(productId) {
