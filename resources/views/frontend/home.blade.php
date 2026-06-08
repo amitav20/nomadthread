@@ -49,7 +49,7 @@
   
   <!-- Global Hero Background Video (Plays continuously, does not slide or fade) -->
   @if($hasGlobalVideo)
-    <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #000; z-index: 1; pointer-events: none;">
+    <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; z-index: 1; pointer-events: none;">
       <video autoplay loop muted playsinline style="position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; object-fit: cover; transform: translate(-50%, -50%); opacity: 0.55;">
         <source src="{{ $globalVideoUrl }}" type="video/mp4">
       </video>
@@ -57,12 +57,12 @@
   @endif
 
   <!-- Slider Wrapper -->
-  <div class="hero-slider-container" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;">
+  <div class="hero-slider-container" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; transform: translate3d(0,0,0); backface-visibility: hidden;">
     @foreach($heroBanners as $index => $banner)
       <div class="hero-slide" id="hero-slide-{{ $index }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; transition: opacity 0.8s ease-in-out; opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }}; visibility: {{ $index === 0 ? 'visible' : 'hidden' }};">
         
         <!-- Left Side Content (Green Overlaid on Global Video) -->
-        <div class="hero-left" style="background: {{ $hasGlobalVideo ? 'rgba(16, 38, 16, 0.85)' : 'var(--espresso)' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2; position: relative;">
+        <div class="hero-left" style="background: {{ $hasGlobalVideo ? 'rgba(16, 38, 16, 0.85)' : 'var(--espresso)' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden;">
           <div class="hero-tag">New Collection 2026</div>
           <h1>{!! $banner['title'] !!}</h1>
           <p class="hero-desc">{{ $banner['subheadline'] }}</p>
@@ -73,7 +73,7 @@
         </div>
 
         <!-- Right Side Media & Slider Card (Chocolate Overlaid on Global Video) -->
-        <div class="hero-right" style="position: relative; height: 100%; background: {{ $hasGlobalVideo ? 'rgba(44, 26, 14, 0.7)' : 'transparent' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2;">
+        <div class="hero-right" style="position: relative; height: 100%; background: {{ $hasGlobalVideo ? 'rgba(44, 26, 14, 0.7)' : 'transparent' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2; transform: translate3d(0,0,0); backface-visibility: hidden;">
           
           @if(!$hasGlobalVideo)
             <!-- Fallback gradient background when there is no global video -->
