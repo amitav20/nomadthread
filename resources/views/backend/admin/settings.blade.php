@@ -91,7 +91,7 @@
             <label class="form-label">Logo Image (PNG/JPG/SVG)</label>
             @if(!empty($settings['logo_image']))
               <div style="margin-bottom: 10px;">
-                <img src="{{ asset($settings['logo_image']) }}" alt="Current Logo" style="height: 50px; background: #eee; padding: 5px; border-radius: 4px; object-fit: contain;">
+                <img src="{{ asset(ltrim($settings['logo_image'], '/')) }}" alt="Current Logo" style="height: 50px; background: #eee; padding: 5px; border-radius: 4px; object-fit: contain;">
               </div>
             @endif
             <input type="file" name="logo_image" class="form-input">

@@ -5,6 +5,14 @@ const cartItems = [];
 let currentModalProduct = null;
 let currentModalColor = null;
 
+function getAssetUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const base = window.routes?.assetBaseUrl || '/';
+  const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+  return base.endsWith('/') ? base + cleanPath : base + '/' + cleanPath;
+}
+
 // ─── RENDER PRODUCTS ──────────────────────────────────
 function getColorClass(colorName) {
   const map = { tan:'color-tan', espresso:'color-espresso', cognac:'color-cognac', black:'color-black', olive:'color-olive', wine:'color-wine', camel:'color-camel', slate:'color-slate' };
@@ -32,7 +40,7 @@ function renderProducts(filter = 'all') {
         <div class="product-thumb">
           <a href="${getProductUrl(p.sku)}" style="display:block; width:100%; height:100%">
             ${p.images && p.images.length > 0 
-              ? `<img src="${p.images[0].image_path}" alt="${p.images[0].alt_text || p.name}" style="width:100%; height:100%; object-fit:cover;" id="thumb-${p.id}">`
+              ? `<img src="${getAssetUrl(p.images[0].image_path)}" alt="${p.images[0].alt_text || p.name}" style="width:100%; height:100%; object-fit:cover;" id="thumb-${p.id}">`
               : `<div class="product-visual ${p.shape || 'bag-shape'} ${getColorClass(firstColor)}" data-product="${p.id}" id="thumb-${p.id}"></div>`
             }
           </a>
@@ -126,7 +134,7 @@ function updateCartUI() {
     <div class="cart-item">
       <div class="cart-item-visual">
         ${item.image_path 
-          ? `<img src="${item.image_path}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--border);" alt="${item.name}">`
+          ? `<img src="${getAssetUrl(item.image_path)}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--border);" alt="${item.name}">`
           : `<div class="product-visual cart-item-mini ${item.shape || 'bag-shape'} ${getColorClass(item.color)}"></div>`
         }
       </div>
@@ -186,7 +194,7 @@ function openModal(productId) {
   modalImageUrls = [];
 
   if (p.images && p.images.length > 0) {
-    modalImageUrls = p.images.map(img => img.image_path);
+    modalImageUrls = p.images.map(img => getAssetUrl(img.image_path));
     
     // Render main image
     let html = `<img src="${modalImageUrls[0]}" class="modal-img-visual" id="modalVisual" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; transition: opacity 0.3s ease;">`;
@@ -209,8 +217,8 @@ function openModal(productId) {
     // Render thumbnails
     if (modalImageUrls.length > 1) {
       thumbsContainer.innerHTML = p.images.map((img, index) => `
-        <div onclick="changeModalImage('${img.image_path}', ${index}, this)" class="modal-thumb-item ${index === 0 ? 'active' : ''}" style="width: 50px; height: 50px; border: 1px solid ${index === 0 ? 'var(--gold)' : 'var(--border)'}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s; border-radius: 4px;">
-          <img src="${img.image_path}" alt="${img.alt_text || p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+        <div onclick="changeModalImage('${getAssetUrl(img.image_path)}', ${index}, this)" class="modal-thumb-item ${index === 0 ? 'active' : ''}" style="width: 50px; height: 50px; border: 1px solid ${index === 0 ? 'var(--gold)' : 'var(--border)'}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s; border-radius: 4px;">
+          <img src="${getAssetUrl(img.image_path)}" alt="${img.alt_text || p.name}" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
       `).join('');
     } else {

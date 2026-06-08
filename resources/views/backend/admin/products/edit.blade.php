@@ -171,7 +171,7 @@
                 @foreach($product->images as $img)
                   <div style="display: flex; gap: 16px; align-items: flex-start; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;">
                     <div style="width: 80px; height: 80px; border-radius: 6px; overflow: hidden; background: var(--bg4); border: 1px solid var(--border); flex-shrink: 0;">
-                      <img src="{{ asset($img->image_path) }}" alt="{{ $img->alt_text }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      <img src="{{ asset(ltrim($img->image_path, '/')) }}" alt="{{ $img->alt_text }}" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                       <div class="form-group" style="margin: 0;">

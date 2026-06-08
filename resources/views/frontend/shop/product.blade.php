@@ -17,7 +17,7 @@
       $imageUrls = [];
       if(!empty($product['images'])) {
         foreach($product['images'] as $img) {
-          $imageUrls[] = asset($img['image_path']);
+          $imageUrls[] = asset(ltrim($img['image_path'], '/'));
         }
       }
     @endphp
@@ -34,7 +34,7 @@
           @endif
           
           @if(!empty($product['images']))
-            <img src="{{ asset($product['images'][0]['image_path']) }}" alt="{{ $product['images'][0]['alt_text'] ?? $product['name'] }}" id="productMainImage" style="max-width: 100%; max-height: 380px; object-fit: contain; transition: opacity 0.3s ease;">
+            <img src="{{ asset(ltrim($product['images'][0]['image_path'], '/')) }}" alt="{{ $product['images'][0]['alt_text'] ?? $product['name'] }}" id="productMainImage" style="max-width: 100%; max-height: 380px; object-fit: contain; transition: opacity 0.3s ease;">
             
             @if(count($product['images']) > 1)
               <!-- Left Arrow -->
@@ -54,8 +54,8 @@
         @if(!empty($product['images']) && count($product['images']) > 1)
           <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;">
             @foreach($product['images'] as $index => $img)
-              <div onclick="changeDetailImage('{{ asset($img['image_path']) }}', this, {{ $index }})" class="detail-thumb-item {{ $index === 0 ? 'active' : '' }}" style="width: 70px; height: 70px; border: 1px solid {{ $index === 0 ? 'var(--gold)' : 'var(--border)' }}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s;">
-                <img src="{{ asset($img['image_path']) }}" alt="{{ $img['alt_text'] ?? $product['name'] }}" style="width: 100%; height: 100%; object-fit: cover;">
+              <div onclick="changeDetailImage('{{ asset(ltrim($img['image_path'], '/')) }}', this, {{ $index }})" class="detail-thumb-item {{ $index === 0 ? 'active' : '' }}" style="width: 70px; height: 70px; border: 1px solid {{ $index === 0 ? 'var(--gold)' : 'var(--border)' }}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s;">
+                <img src="{{ asset(ltrim($img['image_path'], '/')) }}" alt="{{ $img['alt_text'] ?? $product['name'] }}" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
             @endforeach
           </div>

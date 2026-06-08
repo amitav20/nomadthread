@@ -74,7 +74,7 @@
             <div class="product-thumb">
               <a href="{{ route('shop.product', $p['sku']) }}" style="display:block; width:100%; height:100%">
                 @if(!empty($p['images']))
-                  <img src="{{ asset($p['images'][0]['image_path']) }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" style="width:100%; height:100%; object-fit:cover;" id="thumb-{{ $p['id'] }}">
+                  <img src="{{ asset(ltrim($p['images'][0]['image_path'], '/')) }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" style="width:100%; height:100%; object-fit:cover;" id="thumb-{{ $p['id'] }}">
                 @else
                   <div class="product-visual {{ $p['shape'] ?? 'bag-shape' }} color-{{ $firstColor }}" data-product="{{ $p['id'] }}" id="thumb-{{ $p['id'] }}"></div>
                 @endif

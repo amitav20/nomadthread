@@ -83,7 +83,7 @@
                     @php
                       $primaryImg = $p->images->firstWhere('is_primary', true) ?? $p->images->first();
                     @endphp
-                    <img src="{{ asset($primaryImg->image_path) }}" alt="{{ $p->name }}">
+                    <img src="{{ asset(ltrim($primaryImg->image_path, '/')) }}" alt="{{ $p->name }}">
                   @else
                     <div class="product-visual {{ $p->shape }}" style="transform: scale(0.3); width: 80px; height: 80px; flex-shrink: 0; background-color: transparent;"></div>
                   @endif
