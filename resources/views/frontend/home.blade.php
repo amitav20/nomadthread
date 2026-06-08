@@ -43,7 +43,7 @@
         }
         $hasVideo = !empty($videoUrl);
       @endphp
-      <div class="hero-slide" id="hero-slide-{{ $index }}" style="opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }};">
+      <div class="hero-slide" id="hero-slide-{{ $index }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; transition: opacity 0.8s ease-in-out; opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }};">
         
         <!-- Full Banner Background Video (Behind both green and chocolate overlays) -->
         @if($hasVideo)
@@ -57,34 +57,7 @@
         <!-- Left Side Content (Green Overlaid on Video) -->
         <div class="hero-left" style="background: {{ $hasVideo ? 'rgba(16, 38, 16, 0.85)' : 'var(--espresso)' }}; backdrop-filter: {{ $hasVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasVideo ? 'blur(8px)' : 'none' }}; z-index: 2; position: relative;">
           <div class="hero-tag">New Collection 2026</div>
-          @php
-            $rawTitle = $banner['title'] ?? '';
-            $titleHtml = $rawTitle;
-            
-            // Auto-format plain-text titles to make them stylish (highlighting first/last words with gold italics)
-            if (!empty($titleHtml) && strip_tags($titleHtml) === $titleHtml) {
-                $words = explode(' ', $titleHtml);
-                if (count($words) >= 3) {
-                    $words[0] = '<em>' . $words[0] . '</em>';
-                    $lastIdx = count($words) - 1;
-                    $words[$lastIdx] = '<em>' . $words[$lastIdx] . '</em>';
-                    $titleHtml = implode(' ', $words);
-                } elseif (count($words) == 2) {
-                    $words[1] = '<em>' . $words[1] . '</em>';
-                    $titleHtml = implode(' ', $words);
-                }
-            }
-            
-            // Dynamically scale down font size for long headings to prevent layout breakage
-            $charCount = strlen(strip_tags($rawTitle));
-            $titleClass = 'hero-title';
-            if ($charCount > 50) {
-                $titleClass .= ' hero-title-xlong';
-            } elseif ($charCount > 25) {
-                $titleClass .= ' hero-title-long';
-            }
-          @endphp
-          <h1 class="{{ $titleClass }}">{!! $titleHtml !!}</h1>
+          <h1>{!! $banner['title'] !!}</h1>
           <p class="hero-desc">{{ $banner['subheadline'] }}</p>
           <div class="hero-btns">
             <a href="{{ $banner['cta_link'] ?? '#products' }}" class="btn-primary"><span>{{ $banner['cta_text'] ?? 'Explore Collection' }}</span></a>
