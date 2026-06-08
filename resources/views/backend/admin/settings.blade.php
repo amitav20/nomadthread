@@ -97,6 +97,15 @@
             <input type="file" name="logo_image" class="form-input">
           </div>
           <div class="form-group">
+            <label class="form-label">Homepage Hero Video (MP4/WebM Loop)</label>
+            @if(!empty($settings['hero_video']))
+              <div style="margin-bottom: 10px;">
+                <video src="{{ asset(ltrim($settings['hero_video'], '/')) }}" style="height: 100px; border-radius: 4px; background: #000;" autoplay loop muted></video>
+              </div>
+            @endif
+            <input type="file" name="hero_video" class="form-input" accept="video/*">
+          </div>
+          <div class="form-group">
             <label class="form-label">Top Bar Announcement Text (HTML Allowed)</label>
             <textarea name="top_bar_text" class="form-input" style="min-height:75px;">{{ old('top_bar_text', $settings['top_bar_text'] ?? '') }}</textarea>
           </div>

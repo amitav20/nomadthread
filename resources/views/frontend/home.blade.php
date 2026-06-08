@@ -51,10 +51,17 @@
         <div class="hero-right" style="position: relative; height: 100%;">
           
           <!-- Background Video Section -->
-          @if(!empty($banner['video']))
+          @if(!empty($siteSettings['hero_video']))
             <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #000; z-index: 1;">
               <video autoplay loop muted playsinline style="position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; object-fit: cover; transform: translate(-50%, -50%); opacity: 0.45;">
-                <source src="{{ $banner['video'] }}" type="video/mp4">
+                <source src="{{ asset(ltrim($siteSettings['hero_video'], '/')) }}" type="video/mp4">
+              </video>
+              <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(44,26,14,0.7) 0%, rgba(44,26,14,0.3) 100%);"></div>
+            </div>
+          @elseif(!empty($banner['video']))
+            <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #000; z-index: 1;">
+              <video autoplay loop muted playsinline style="position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; object-fit: cover; transform: translate(-50%, -50%); opacity: 0.45;">
+                <source src="{{ asset(ltrim($banner['video'], '/')) }}" type="video/mp4">
               </video>
               <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(44,26,14,0.7) 0%, rgba(44,26,14,0.3) 100%);"></div>
             </div>
@@ -73,7 +80,7 @@
                 
                 @if(!empty($banner['image']))
                   <div style="width: 260px; height: 220px; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow);">
-                    <img src="{{ $banner['image'] }}" alt="{{ $banner['title'] }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ asset(ltrim($banner['image'], '/')) }}" alt="{{ $banner['title'] }}" style="width: 100%; height: 100%; object-fit: cover;">
                   </div>
                 @else
                   <div class="product-silhouette"></div>

@@ -703,6 +703,13 @@ class AdminController extends Controller
             $data['logo_image'] = '/uploads/' . $path;
         }
 
+        if ($request->hasFile('hero_video')) {
+            $file = $request->file('hero_video');
+            $filename = 'hero_video_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('branding', $filename, 'public');
+            $data['hero_video'] = '/uploads/' . $path;
+        }
+
         foreach ($data as $key => $value) {
             if ($value !== null) {
                 \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
