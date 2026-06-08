@@ -43,7 +43,7 @@
         }
         $hasVideo = !empty($videoUrl);
       @endphp
-      <div class="hero-slide" id="hero-slide-{{ $index }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; transition: opacity 0.8s ease-in-out; opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }};">
+      <div class="hero-slide" id="hero-slide-{{ $index }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; transition: opacity 0.8s ease-in-out; opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }}; visibility: {{ $index === 0 ? 'visible' : 'hidden' }};">
         
         <!-- Full Banner Background Video (Behind both green and chocolate overlays) -->
         @if($hasVideo)
@@ -139,6 +139,7 @@
       prevSlideEl.style.opacity = '0';
       prevSlideEl.style.pointerEvents = 'none';
       prevSlideEl.style.zIndex = '1';
+      prevSlideEl.style.visibility = 'hidden';
     }
     if (prevDotEl) {
       prevDotEl.style.opacity = '0.4';
@@ -156,6 +157,7 @@
       nextSlideEl.style.opacity = '1';
       nextSlideEl.style.pointerEvents = 'auto';
       nextSlideEl.style.zIndex = '3';
+      nextSlideEl.style.visibility = 'visible';
     }
     if (nextDotEl) {
       nextDotEl.style.opacity = '1';
