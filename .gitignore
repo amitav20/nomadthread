@@ -19,9 +19,10 @@
 /storage/*.key
 /storage/pail
 /vendor
-/public/uploads/*
-!/public/uploads/branding/
-!/public/uploads/branding/**
+/public/uploads
+/uploads/*
+!/uploads/branding/
+!/uploads/branding/**
 Homestead.json
 Homestead.yaml
 Thumbs.db
