@@ -217,11 +217,11 @@
     </div>
 
     <div class="filter-bar reveal">
-      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-btn active" data-category="all" onclick="filterProducts('all', this)">All</button>
       @foreach($categories as $cat)
-        <button class="filter-btn" onclick="filterProducts('{{ $cat['slug'] }}', this)">{{ $cat['name'] }}</button>
+        <button class="filter-btn" data-category="{{ $cat['slug'] }}" onclick="filterProducts('{{ $cat['slug'] }}', this)">{{ $cat['name'] }}</button>
       @endforeach
-      <button class="filter-btn" onclick="filterProducts('new', this)">New Arrivals</button>
+      <button class="filter-btn" data-category="new" onclick="filterProducts('new', this)">New Arrivals</button>
     </div>
 
     <div class="product-grid" id="productGrid"></div>

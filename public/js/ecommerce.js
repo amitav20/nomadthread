@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Failed to fetch products:', err);
   }
   const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
-  const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-category') : 'all';
+  const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
   const grid = document.getElementById('productGrid');
   if (grid && grid.children.length === 0) {
     renderProducts(activeFilter);
