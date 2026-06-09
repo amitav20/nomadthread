@@ -42,7 +42,7 @@
     @endif
 
     <!-- Category Filter Bar -->
-    <div class="filter-bar reveal visible" style="margin-bottom: 40px; justify-content: center; display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="filter-bar reveal visible" style="margin-bottom: 30px; justify-content: center; display: flex; gap: 10px; flex-wrap: wrap;">
       <a href="{{ route('shop.index') }}" class="filter-btn active" style="text-decoration:none" data-category="all">All</a>
       @foreach($categories as $cat)
         <a href="{{ route('shop.category', $cat['slug']) }}" class="filter-btn" style="text-decoration:none" data-category="{{ $cat['slug'] }}">
@@ -51,13 +51,21 @@
       @endforeach
     </div>
 
+    <!-- Gender Filter Bar -->
+    <div class="gender-filter-bar reveal visible">
+      <span class="gender-label">Collection For:</span>
+      <button onclick="filterByGender('all')" class="gender-btn active" id="gender-all">All</button>
+      <button onclick="filterByGender('men')" class="gender-btn" id="gender-men">Men</button>
+      <button onclick="filterByGender('women')" class="gender-btn" id="gender-women">Women</button>
+    </div>
+
     <div class="product-grid" id="productGrid">
       @forelse($products as $p)
         @php
           $colorsList = is_array($p['colors']) ? $p['colors'] : explode(',', $p['colors'] ?? '');
           $firstColor = $colorsList[0] ?? 'tan';
         @endphp
-        <div class="product-card" data-id="{{ $p['id'] }}">
+        <div class="product-card" data-id="{{ $p['id'] }}" data-gender="{{ $p['gender'] ?? 'unisex' }}">
           <div class="product-img-wrap">
             @if(!empty($p['badge']))
               <div class="product-badge {{ $p['badge'] === 'new' ? 'badge-new' : 'badge-sale' }}">
@@ -108,4 +116,65 @@
     </div>
   </div>
 </section>
+
+<script>
+  function filterByGender(gender) {
+    // Update button active state
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById('gender-' + gender);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+    }
+
+    // Filter cards
+    const cards = document.querySelectorAll('.product-card');
+    let count = 0;
+    cards.forEach(card => {
+      const productGender = card.getAttribute('data-gender') || 'unisex';
+      if (gender === 'all') {
+        card.style.display = 'block';
+        count++;
+      } else if (gender === 'men') {
+        if (productGender === 'men' || productGender === 'unisex') {
+          card.style.display = 'block';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      } else if (gender === 'women') {
+        if (productGender === 'women' || productGender === 'unisex') {
+          card.style.display = 'block';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      }
+    });
+
+    // Handle empty state message if no products match
+    let emptyMsg = document.getElementById('noProductsGenderMsg');
+    if (count === 0) {
+      if (!emptyMsg) {
+        emptyMsg = document.createElement('div');
+        emptyMsg.id = 'noProductsGenderMsg';
+        emptyMsg.style.gridColumn = '1/-1';
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.padding = '80px 20px';
+        emptyMsg.style.fontFamily = "'Cormorant Garamond', serif";
+        emptyMsg.style.fontSize = '24px';
+        emptyMsg.style.color = 'var(--text-light)';
+        emptyMsg.innerText = 'No products found for this selection.';
+        document.getElementById('productGrid').appendChild(emptyMsg);
+      } else {
+        emptyMsg.style.display = 'block';
+      }
+    } else {
+      if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
+    }
+  }
+</script>
 @endsection

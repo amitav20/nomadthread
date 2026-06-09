@@ -16,7 +16,7 @@
   </div>
 @endif
 
-<form action="{{ route('backend.categories.update', $category->id) }}" method="POST">
+<form action="{{ route('backend.categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
   @csrf
   @method('PUT')
   
@@ -67,6 +67,52 @@
           </div>
         </div>
       </div>
+
+      <!-- Category Media -->
+      <div class="card" style="margin-top: 20px;">
+        <div class="card-head"><div class="card-title"><i class="ti ti-photo" style="margin-right:8px;color:var(--gold)"></i>Category Media</div></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Category Banner Image</label>
+            @if($category->image_banner)
+              <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <img src="{{ asset(ltrim($category->image_banner, '/')) }}" style="max-height: 80px; border-radius: 4px; border: 1px solid var(--border);">
+                <label style="color: var(--red); cursor: pointer; font-size: 13px;">
+                  <input type="checkbox" name="delete_banner" value="1"> Delete Current Banner
+                </label>
+              </div>
+            @endif
+            <input type="file" name="image_banner" class="form-input" accept="image/*">
+            <div class="form-hint">Shown as header background on category pages. Max size: 5MB.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category Thumbnail Image</label>
+            @if($category->image_thumbnail)
+              <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <img src="{{ asset(ltrim($category->image_thumbnail, '/')) }}" style="max-height: 80px; border-radius: 4px; border: 1px solid var(--border);">
+                <label style="color: var(--red); cursor: pointer; font-size: 13px;">
+                  <input type="checkbox" name="delete_thumbnail" value="1"> Delete Current Thumbnail
+                </label>
+              </div>
+            @endif
+            <input type="file" name="image_thumbnail" class="form-input" accept="image/*">
+            <div class="form-hint">Used in grid previews. Max size: 5MB.</div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Category Promo Video</label>
+            @if($category->video)
+              <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <video src="{{ asset(ltrim($category->video, '/')) }}" style="max-height: 80px; border-radius: 4px; border: 1px solid var(--border);" controls muted></video>
+                <label style="color: var(--red); cursor: pointer; font-size: 13px;">
+                  <input type="checkbox" name="delete_video" value="1"> Delete Current Video
+                </label>
+              </div>
+            @endif
+            <input type="file" name="video" class="form-input" accept="video/*">
+            <div class="form-hint">Played in background grid. Max size: 20MB.</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div>
@@ -74,11 +120,19 @@
       <div class="card">
         <div class="card-head"><div class="card-title">Display Settings</div></div>
         <div class="card-body">
-          <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group">
             <label class="form-label">Status</label>
             <select name="status" class="form-input">
               <option value="active" {{ old('status', $category->status) == 'active' ? 'selected' : '' }}>Active (Visible)</option>
               <option value="inactive" {{ old('status', $category->status) == 'inactive' ? 'selected' : '' }}>Hidden</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
+            <label class="form-label">Gender Category Selection <span>*</span></label>
+            <select name="gender" class="form-input" required>
+              <option value="both" {{ old('gender', $category->gender) == 'both' ? 'selected' : '' }}>Both (Unisex)</option>
+              <option value="men" {{ old('gender', $category->gender) == 'men' ? 'selected' : '' }}>For Men</option>
+              <option value="women" {{ old('gender', $category->gender) == 'women' ? 'selected' : '' }}>For Women</option>
             </select>
           </div>
           <div class="divider" style="margin: 20px 0;"></div>

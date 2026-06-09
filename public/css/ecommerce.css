@@ -619,6 +619,40 @@ section { padding: 100px 0; }
   border-color: var(--espresso);
 }
 
+.gender-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: -20px;
+  margin-bottom: 40px;
+}
+.gender-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-right: 8px;
+}
+.gender-btn {
+  padding: 8px 20px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.gender-btn.active, .gender-btn:hover {
+  background: var(--espresso);
+  color: var(--tan-light);
+  border-color: var(--espresso);
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

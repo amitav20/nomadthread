@@ -12,9 +12,11 @@ class Category extends Model
         'description',
         'image_banner',
         'image_thumbnail',
+        'video',
         'icon',
         'accent_color',
         'status',
+        'gender',
     ];
 
     public function products()

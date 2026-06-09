@@ -213,7 +213,15 @@
     <div class="cat-grid reveal">
       @foreach($categories as $cat)
         <a href="{{ route('shop.category', $cat['slug']) }}" class="cat-card">
-          <div class="cat-bg {{ $bgMap[$cat['slug']] ?? 'bg-bags' }}" style="height:100%"></div>
+          @if(!empty($cat['video']))
+            <video src="{{ asset(ltrim($cat['video'], '/')) }}" autoplay loop muted playsinline class="cat-bg" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0; pointer-events:none; z-index:0;"></video>
+          @elseif(!empty($cat['image_thumbnail']))
+            <div class="cat-bg" style="background-image: url('{{ asset(ltrim($cat['image_thumbnail'], '/')) }}'); height:100%; background-size:cover; background-position:center;"></div>
+          @elseif(!empty($cat['image_banner']))
+            <div class="cat-bg" style="background-image: url('{{ asset(ltrim($cat['image_banner'], '/')) }}'); height:100%; background-size:cover; background-position:center;"></div>
+          @else
+            <div class="cat-bg {{ $bgMap[$cat['slug']] ?? 'bg-bags' }}" style="height:100%"></div>
+          @endif
           <div class="cat-overlay"></div>
           <div class="cat-arrow">↗</div>
           <div class="cat-info">

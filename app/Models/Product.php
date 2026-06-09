@@ -41,6 +41,7 @@ class Product extends Model
         'show_on_homepage',
         'enable_reviews',
         'allow_giftwrap',
+        'gender',
     ];
 
     public function category()

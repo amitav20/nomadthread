@@ -37,6 +37,17 @@ class ApiController extends Controller
             });
         }
 
+        if ($request->has('gender') && $request->input('gender') !== 'all') {
+            $gender = $request->input('gender');
+            if ($gender === 'men' || $gender === 'm') {
+                $query->whereIn('gender', ['men', 'unisex']);
+            } elseif ($gender === 'women' || $gender === 'f') {
+                $query->whereIn('gender', ['women', 'unisex']);
+            } else {
+                $query->where('gender', $gender);
+            }
+        }
+
         if ($request->has('new') && $request->input('new') == 1) {
             $query->where('badge', 'new');
         }

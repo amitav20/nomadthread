@@ -81,6 +81,7 @@ class AdminController extends Controller
             'stock_quantity' => 'required|integer',
             'low_stock_alert' => 'nullable|integer',
             'badge' => 'nullable|string',
+            'gender' => 'nullable|string|in:unisex,men,women',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
@@ -101,6 +102,7 @@ class AdminController extends Controller
             'low_stock_alert' => $request->low_stock_alert ?: 10,
             'stock_status' => $request->stock_quantity > 0 ? 'In Stock' : 'Out of Stock',
             'badge' => $request->badge,
+            'gender' => $request->gender ?: 'unisex',
         ]);
 
         // Upload and save product images securely
@@ -157,6 +159,7 @@ class AdminController extends Controller
             'stock_quantity' => 'required|integer',
             'low_stock_alert' => 'nullable|integer',
             'badge' => 'nullable|string',
+            'gender' => 'nullable|string|in:unisex,men,women',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
@@ -177,6 +180,7 @@ class AdminController extends Controller
             'low_stock_alert' => $request->low_stock_alert ?: 10,
             'stock_status' => $request->stock_quantity > 0 ? 'In Stock' : 'Out of Stock',
             'badge' => $request->badge,
+            'gender' => $request->gender ?: 'unisex',
         ]);
 
         // Manage existing images deletions
@@ -274,16 +278,47 @@ class AdminController extends Controller
             'icon' => 'nullable|string',
             'status' => 'required|string',
             'accent_color' => 'nullable|string',
+            'gender' => 'nullable|string|in:men,women,both',
+            'image_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'video' => 'nullable|mimes:mp4,mov,ogg,qt,webm|max:20480',
         ]);
 
-        Category::create([
+        $category = Category::create([
             'name' => $request->name,
             'slug' => $request->slug,
             'description' => $request->description,
             'icon' => $request->icon ?: '👜',
             'status' => $request->status,
             'accent_color' => $request->accent_color ?: '#c9a84c',
+            'gender' => $request->gender ?: 'both',
         ]);
+
+        $uploadedData = [];
+        if ($request->hasFile('image_banner')) {
+            $file = $request->file('image_banner');
+            $filename = 'banner_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $uploadedData['image_banner'] = '/uploads/' . $path;
+        }
+
+        if ($request->hasFile('image_thumbnail')) {
+            $file = $request->file('image_thumbnail');
+            $filename = 'thumbnail_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $uploadedData['image_thumbnail'] = '/uploads/' . $path;
+        }
+
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+            $filename = 'video_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $uploadedData['video'] = '/uploads/' . $path;
+        }
+
+        if (!empty($uploadedData)) {
+            $category->update($uploadedData);
+        }
 
         return redirect()->route('backend.categories.index')->with('success', 'Category created successfully.');
     }
@@ -304,16 +339,72 @@ class AdminController extends Controller
             'icon' => 'nullable|string',
             'status' => 'required|string',
             'accent_color' => 'nullable|string',
+            'gender' => 'nullable|string|in:men,women,both',
+            'image_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'video' => 'nullable|mimes:mp4,mov,ogg,qt,webm|max:20480',
         ]);
 
-        $category->update([
+        $data = [
             'name' => $request->name,
             'slug' => $request->slug,
             'description' => $request->description,
             'icon' => $request->icon ?: '👜',
             'status' => $request->status,
             'accent_color' => $request->accent_color ?: '#c9a84c',
-        ]);
+            'gender' => $request->gender ?: 'both',
+        ];
+
+        if ($request->hasFile('image_banner')) {
+            if ($category->image_banner) {
+                $oldPath = str_replace('/uploads/', '', $category->image_banner);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $file = $request->file('image_banner');
+            $filename = 'banner_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $data['image_banner'] = '/uploads/' . $path;
+        }
+
+        if ($request->hasFile('image_thumbnail')) {
+            if ($category->image_thumbnail) {
+                $oldPath = str_replace('/uploads/', '', $category->image_thumbnail);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $file = $request->file('image_thumbnail');
+            $filename = 'thumbnail_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $data['image_thumbnail'] = '/uploads/' . $path;
+        }
+
+        if ($request->hasFile('video')) {
+            if ($category->video) {
+                $oldPath = str_replace('/uploads/', '', $category->video);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $file = $request->file('video');
+            $filename = 'video_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('categories/' . $category->id, $filename, 'public');
+            $data['video'] = '/uploads/' . $path;
+        }
+
+        if ($request->input('delete_banner') == 1 && $category->image_banner) {
+            $oldPath = str_replace('/uploads/', '', $category->image_banner);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            $data['image_banner'] = null;
+        }
+        if ($request->input('delete_thumbnail') == 1 && $category->image_thumbnail) {
+            $oldPath = str_replace('/uploads/', '', $category->image_thumbnail);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            $data['image_thumbnail'] = null;
+        }
+        if ($request->input('delete_video') == 1 && $category->video) {
+            $oldPath = str_replace('/uploads/', '', $category->video);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            $data['video'] = null;
+        }
+
+        $category->update($data);
 
         return redirect()->route('backend.categories.index')->with('success', 'Category updated successfully.');
     }
