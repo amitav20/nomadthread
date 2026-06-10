@@ -1,10 +1,23 @@
 // ─── DATA ───────────────────────────────────────────────
 let products = [];
+let cartItems = [];
 
-const cartItems = [];
-let currentModalProduct = null;
-let currentModalColor = null;
+// Load cart items from localStorage
+try {
+  cartItems = JSON.parse(localStorage.getItem('nomad_cart') || '[]');
+} catch (e) {
+  cartItems = [];
+}
 
+// Global Filter states
+let filterSearch = '';
+let filterGender = 'all';
+let filterPriceMax = 50000;
+let filterColors = [];
+let filterSizes = [];
+let filterSort = 'default';
+
+// Local helper to resolve assets
 function getAssetUrl(path) {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -13,27 +26,194 @@ function getAssetUrl(path) {
   return base.endsWith('/') ? base + cleanPath : base + '/' + cleanPath;
 }
 
+// ─── CURRENCY & CONVERSION ──────────────────────────────
+function getExchangeRate() {
+  return parseFloat(localStorage.getItem('nomad_exchange_rate') || '1.0');
+}
+
+function getCurrencySymbol() {
+  return localStorage.getItem('nomad_currency_symbol') || '₹';
+}
+
+function getCurrencyCode() {
+  return localStorage.getItem('nomad_currency_code') || 'INR';
+}
+
+function formatPrice(p) {
+  const rate = getExchangeRate();
+  const symbol = getCurrencySymbol();
+  const converted = p * rate;
+  
+  if (symbol === '₹') {
+    return symbol + Math.round(converted).toLocaleString('en-IN');
+  } else {
+    // Format USD, GBP, EUR with 2 decimal places
+    return symbol + converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+}
+
+// Global country selection handler
+function changeCountryCode(code) {
+  if (!window.countries) return;
+  const country = window.countries.find(c => c.code === code);
+  if (country) {
+    localStorage.setItem('nomad_country', country.code);
+    localStorage.setItem('nomad_exchange_rate', country.exchange_rate);
+    localStorage.setItem('nomad_currency_symbol', country.currency_symbol);
+    localStorage.setItem('nomad_currency_code', country.currency_code);
+    
+    // Sync header selector value
+    const selector = document.getElementById('countrySelector');
+    if (selector) selector.value = code;
+    
+    // Sync checkout selector value if exists
+    const checkoutSelector = document.getElementById('checkoutCountrySelector');
+    if (checkoutSelector) checkoutSelector.value = code;
+
+    // Refresh UI
+    updateCartUI();
+    
+    // Re-render product grids if they exist
+    const grid = document.getElementById('productGrid');
+    if (grid) {
+      const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
+      const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
+      renderProducts(activeFilter);
+    }
+    
+    // Refresh product details page prices if on details page
+    updateProductDetailPagePrices();
+    
+    // Refresh checkout prices if on checkout page
+    if (typeof updateCheckoutSummary === 'function') {
+      updateCheckoutSummary();
+    }
+    
+    showToast(`Currency changed to ${country.currency_code} (${country.currency_symbol})`);
+  }
+}
+
+// Helper to update details page prices
+function updateProductDetailPagePrices() {
+  const priceCurrent = document.querySelector('.product-details-info .price-current');
+  if (priceCurrent) {
+    const basePrice = parseInt(priceCurrent.getAttribute('data-base-price') || priceCurrent.textContent.replace(/[^0-9]/g, ''));
+    if (!priceCurrent.getAttribute('data-base-price')) {
+      priceCurrent.setAttribute('data-base-price', basePrice);
+    }
+    priceCurrent.textContent = formatPrice(basePrice);
+  }
+  
+  const priceOld = document.querySelector('.product-details-info .price-old');
+  if (priceOld) {
+    const basePrice = parseInt(priceOld.getAttribute('data-base-price') || priceOld.textContent.replace(/[^0-9]/g, ''));
+    if (!priceOld.getAttribute('data-base-price')) {
+      priceOld.setAttribute('data-base-price', basePrice);
+    }
+    priceOld.textContent = formatPrice(basePrice);
+  }
+  
+  const btnAddFull = document.querySelector('.btn-add-full');
+  if (btnAddFull) {
+    const basePrice = parseInt(btnAddFull.getAttribute('data-base-price') || btnAddFull.textContent.replace(/[^0-9]/g, ''));
+    if (!btnAddFull.getAttribute('data-base-price')) {
+      btnAddFull.setAttribute('data-base-price', basePrice);
+    }
+    const currentPriceText = btnAddFull.textContent;
+    const baseText = currentPriceText.split('—')[0].trim();
+    btnAddFull.textContent = baseText + ' — ' + formatPrice(basePrice);
+  }
+}
+
 // ─── RENDER PRODUCTS ──────────────────────────────────
 function getColorClass(colorName) {
-  const map = { tan:'color-tan', espresso:'color-espresso', cognac:'color-cognac', black:'color-black', olive:'color-olive', wine:'color-wine', camel:'color-camel', slate:'color-slate' };
+  const map = { 
+    tan: 'color-tan', 
+    espresso: 'color-espresso', 
+    cognac: 'color-cognac', 
+    black: 'color-black', 
+    olive: 'color-olive', 
+    wine: 'color-wine', 
+    camel: 'color-camel', 
+    slate: 'color-slate' 
+  };
   return map[colorName] || 'color-tan';
 }
-function formatPrice(p) { return '₹' + p.toLocaleString('en-IN'); }
 
-function renderProducts(filter = 'all') {
+function renderProducts(categoryFilter = 'all') {
   const grid = document.getElementById('productGrid');
-  if (!grid) return; // Exit if not on the store index page
-  const filtered = filter === 'all' ? products : products.filter(p => p.category_slug === filter || (filter === 'new' && p.badge === 'new'));
-  
+  if (!grid) return;
+
+  // Filter Catalog
+  let filtered = products;
+
+  // Category filter
+  if (categoryFilter !== 'all') {
+    filtered = filtered.filter(p => p.category_slug === categoryFilter);
+  }
+
+  // Search filter
+  if (filterSearch) {
+    const q = filterSearch.toLowerCase();
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.type && p.type.toLowerCase().includes(q)));
+  }
+
+  // Gender filter
+  if (filterGender !== 'all') {
+    filtered = filtered.filter(p => {
+      const g = p.gender || 'unisex';
+      if (filterGender === 'men') return g === 'men' || g === 'unisex';
+      if (filterGender === 'women') return g === 'women' || g === 'unisex';
+      return g === filterGender;
+    });
+  }
+
+  // Price filter
+  filtered = filtered.filter(p => p.price <= filterPriceMax);
+
+  // Color filter
+  if (filterColors.length > 0) {
+    filtered = filtered.filter(p => {
+      const pColors = p.colors || [];
+      return filterColors.some(c => pColors.includes(c));
+    });
+  }
+
+  // Size filter
+  if (filterSizes.length > 0) {
+    filtered = filtered.filter(p => {
+      const pSizes = p.sizes || [];
+      return filterSizes.some(s => pSizes.includes(s));
+    });
+  }
+
+  // Sorting
+  if (filterSort === 'price-low') {
+    filtered.sort((a, b) => a.price - b.price);
+  } else if (filterSort === 'price-high') {
+    filtered.sort((a, b) => b.price - a.price);
+  } else if (filterSort === 'name-az') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (filterSort === 'newest') {
+    filtered.sort((a, b) => (b.badge === 'new' ? 1 : 0) - (a.badge === 'new' ? 1 : 0));
+  } else {
+    filtered.sort((a, b) => b.id - a.id);
+  }
+
   const getProductUrl = (sku) => {
     const template = window.routes?.productShow || '/product/PLACEHOLDER';
     return template.replace('PLACEHOLDER', sku);
   };
 
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 80px 20px; font-family:'Cormorant Garamond',serif; font-size:24px; color:var(--text-light)">No products match your filters.</div>`;
+    return;
+  }
+
   grid.innerHTML = filtered.map(p => {
     const firstColor = p.colors[0] || 'tan';
     return `
-    <div class="product-card" data-id="${p.id}">
+    <div class="product-card reveal visible" data-id="${p.id}" data-gender="${p.gender || 'unisex'}" style="opacity: 1; transform: none;">
       <div class="product-img-wrap">
         ${p.badge ? `<div class="product-badge ${p.badge === 'new' ? 'badge-new' : 'badge-sale'}">${p.badge === 'new' ? 'New' : 'Sale'}</div>` : ''}
         <button class="product-wishlist" onclick="toggleWishlist(this)" title="Wishlist">♡</button>
@@ -66,12 +246,24 @@ function renderProducts(filter = 'all') {
     </div>
   `;
   }).join('');
+
+  if (window.bindCursorExpands) window.bindCursorExpands();
 }
 
-function filterProducts(cat, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderProducts(cat);
+function filterByGender(gender) {
+  filterGender = gender;
+  
+  // Highlight active gender buttons
+  document.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  const activeBtn = document.getElementById('gender-' + gender);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
+  const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
+  renderProducts(activeFilter);
 }
 
 function changeColor(productId, colorName, swatchEl) {
@@ -90,14 +282,99 @@ function toggleWishlist(btn) {
   showToast(btn.classList.contains('active') ? 'Added to wishlist' : 'Removed from wishlist');
 }
 
+// ─── ADVANCED FILTER CONTROLS ──────────────────────────
+function toggleFilterPanel() {
+  const panel = document.getElementById('advancedFilterPanel');
+  const btn = document.getElementById('filterPanelToggleBtn');
+  if (!panel) return;
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    panel.style.display = 'block';
+    btn.innerHTML = 'Hide Filters &uarr;';
+  } else {
+    panel.style.display = 'none';
+    btn.innerHTML = 'Filter Catalog &darr;';
+  }
+}
+
+function updatePriceLabel(val) {
+  const label = document.getElementById('priceRangeLabel');
+  if (label) {
+    label.textContent = formatPrice(parseInt(val));
+  }
+  filterPriceMax = parseInt(val);
+}
+
+function toggleColorFilter(color, el) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    filterColors.push(color);
+  } else {
+    filterColors = filterColors.filter(c => c !== color);
+  }
+  triggerFilters();
+}
+
+function toggleSizeFilter(el) {
+  const size = el.value;
+  if (el.checked) {
+    filterSizes.push(size);
+  } else {
+    filterSizes = filterSizes.filter(s => s !== size);
+  }
+  triggerFilters();
+}
+
+function handleSearchInput(val) {
+  filterSearch = val;
+  triggerFilters();
+}
+
+function handleSortSelect(val) {
+  filterSort = val;
+  triggerFilters();
+}
+
+function triggerFilters() {
+  const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
+  const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
+  renderProducts(activeFilter);
+}
+
+function resetFilters() {
+  filterSearch = '';
+  filterPriceMax = 50000;
+  filterColors = [];
+  filterSizes = [];
+  filterSort = 'default';
+  
+  const searchInput = document.getElementById('filterSearchInput');
+  if (searchInput) searchInput.value = '';
+  
+  const priceRange = document.getElementById('filterPriceRange');
+  if (priceRange) {
+    priceRange.value = 50000;
+    updatePriceLabel(50000);
+  }
+  
+  const sortSelect = document.getElementById('filterSortSelect');
+  if (sortSelect) sortSelect.value = 'default';
+  
+  document.querySelectorAll('.filter-color-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.filter-size-checkbox').forEach(cb => cb.checked = false);
+  
+  triggerFilters();
+}
+
 // ─── CART ──────────────────────────────────────────────
 function addToCart(productId, colorOverride) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
   const color = colorOverride || p.colors[0];
   const existing = cartItems.find(i => i.id === productId && i.color === color);
-  if (existing) { existing.qty++; }
-  else { 
+  if (existing) { 
+    existing.qty++; 
+  } else { 
     const imgPath = (p.images && p.images.length > 0) ? p.images[0].image_path : null;
     cartItems.push({ 
       id: productId, 
@@ -109,8 +386,13 @@ function addToCart(productId, colorOverride) {
       qty: 1 
     }); 
   }
-  updateCartUI();
+  saveCartAndRefresh();
   showToast(`${p.name} added to cart`);
+}
+
+function saveCartAndRefresh() {
+  localStorage.setItem('nomad_cart', JSON.stringify(cartItems));
+  updateCartUI();
 }
 
 function updateCartUI() {
@@ -130,6 +412,7 @@ function updateCartUI() {
     container.innerHTML = `<div style="text-align:center; padding: 60px 20px; font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--text-light)">Your cart is empty.<br><br>Add some beautiful leather goods!</div>`;
     return;
   }
+  
   container.innerHTML = cartItems.map((item, idx) => `
     <div class="cart-item">
       <div class="cart-item-visual">
@@ -158,14 +441,20 @@ function updateCartUI() {
 function changeQty(idx, delta) {
   cartItems[idx].qty += delta;
   if (cartItems[idx].qty <= 0) cartItems.splice(idx, 1);
-  updateCartUI();
+  saveCartAndRefresh();
 }
-function removeFromCart(idx) { cartItems.splice(idx, 1); updateCartUI(); }
+
+function removeFromCart(idx) { 
+  cartItems.splice(idx, 1); 
+  saveCartAndRefresh(); 
+}
+
 function openCart() {
   document.getElementById('cartDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function closeCart() {
   document.getElementById('cartDrawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
@@ -196,17 +485,13 @@ function openModal(productId) {
   if (p.images && p.images.length > 0) {
     modalImageUrls = p.images.map(img => getAssetUrl(img.image_path));
     
-    // Render main image
     let html = `<img src="${modalImageUrls[0]}" class="modal-img-visual" id="modalVisual" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; transition: opacity 0.3s ease;">`;
     
-    // Render arrows if more than 1 image
     if (modalImageUrls.length > 1) {
       html += `
-        <!-- Left Arrow -->
         <button onclick="navigateModalImage(-1)" class="modal-nav-arrow" style="position: absolute; left: 0px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 14px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
           &#10094;
         </button>
-        <!-- Right Arrow -->
         <button onclick="navigateModalImage(1)" class="modal-nav-arrow" style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); background: rgba(26, 17, 11, 0.65); border: 1px solid var(--border); color: var(--cream); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; font-size: 14px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='rgba(26, 17, 11, 0.65)'; this.style.color='var(--cream)'">
           &#10095;
         </button>
@@ -214,7 +499,6 @@ function openModal(productId) {
     }
     mainContainer.innerHTML = html;
     
-    // Render thumbnails
     if (modalImageUrls.length > 1) {
       thumbsContainer.innerHTML = p.images.map((img, index) => `
         <div onclick="changeModalImage('${getAssetUrl(img.image_path)}', ${index}, this)" class="modal-thumb-item ${index === 0 ? 'active' : ''}" style="width: 50px; height: 50px; border: 1px solid ${index === 0 ? 'var(--gold)' : 'var(--border)'}; cursor: pointer; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: all 0.2s; border-radius: 4px;">
@@ -291,7 +575,6 @@ function navigateModalImage(direction) {
     }, 150);
   }
   
-  // Update thumbnail highlights
   const thumbs = document.querySelectorAll('.modal-thumb-item');
   thumbs.forEach((item, idx) => {
     if (idx === modalCurrentImageIndex) {
@@ -348,9 +631,8 @@ if (cursor && ring) {
   }
   animateRing();
   
-  // Re-bind listener for cursor expansions
   function bindCursorExpands() {
-    document.querySelectorAll('a, button, [class*="btn"], .cat-card, .product-card, .blog-card, .swatch, .forum-search-input, .comment-textarea').forEach(el => {
+    document.querySelectorAll('a, button, [class*="btn"], .cat-card, .product-card, .blog-card, .swatch, .forum-search-input, .comment-textarea, .filter-color-btn').forEach(el => {
       el.removeEventListener('mouseenter', expandRing);
       el.removeEventListener('mouseleave', shrinkRing);
       el.addEventListener('mouseenter', expandRing);
@@ -361,7 +643,6 @@ if (cursor && ring) {
   function expandRing() { ring.classList.add('expand'); }
   function shrinkRing() { ring.classList.remove('expand'); }
   
-  // Expose cursor binding function globally
   window.bindCursorExpands = bindCursorExpands;
   bindCursorExpands();
 }
@@ -372,7 +653,6 @@ window.addEventListener('scroll', () => {
   if (scrollTop) {
     scrollTop.classList.toggle('visible', window.scrollY > 600);
   }
-  // Reveal animations
   document.querySelectorAll('.reveal').forEach(el => {
     if (el.getBoundingClientRect().top < window.innerHeight - 80) el.classList.add('visible');
   });
@@ -380,6 +660,19 @@ window.addEventListener('scroll', () => {
 
 // ─── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // Sync selected country dropdown on load
+  const savedCountry = localStorage.getItem('nomad_country');
+  if (savedCountry) {
+    const selector = document.getElementById('countrySelector');
+    if (selector) selector.value = savedCountry;
+  } else {
+    // Default to India (IN)
+    localStorage.setItem('nomad_country', 'IN');
+    localStorage.setItem('nomad_exchange_rate', '1.0');
+    localStorage.setItem('nomad_currency_symbol', '₹');
+    localStorage.setItem('nomad_currency_code', 'INR');
+  }
+
   try {
     const apiUrl = window.routes?.apiProducts || '/api/products';
     const res = await fetch(apiUrl);
@@ -388,13 +681,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('Failed to fetch products:', err);
   }
-  const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
-  const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
+  
+  // Re-render product list always to apply currency conversion and dynamic filters
   const grid = document.getElementById('productGrid');
-  if (grid && grid.children.length === 0) {
+  if (grid) {
+    const activeFilterBtn = document.querySelector('.filter-bar .filter-btn.active');
+    const activeFilter = (activeFilterBtn && activeFilterBtn.getAttribute('data-category')) || 'all';
     renderProducts(activeFilter);
   }
+  
+  // Update details page prices
+  updateProductDetailPagePrices();
+  
+  // Update cart UI
   updateCartUI();
-  if (window.bindCursorExpands) window.bindCursorExpands();
+  
+  // Trigger scroll reveals
   setTimeout(() => window.dispatchEvent(new Event('scroll')), 100);
 });

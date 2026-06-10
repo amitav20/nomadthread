@@ -52,6 +52,7 @@
     <div class="sidebar-section-label">Config</div>
     <a href="{{ route('backend.shipping') }}" class="nav-item {{ Route::is('backend.shipping') ? 'active' : '' }}"><i class="ti ti-truck"></i> Shipping</a>
     <a href="{{ route('backend.payments') }}" class="nav-item {{ Route::is('backend.payments') ? 'active' : '' }}"><i class="ti ti-credit-card"></i> Payments</a>
+    <a href="{{ route('backend.countries.index') }}" class="nav-item {{ Route::is('backend.countries.*') ? 'active' : '' }}"><i class="ti ti-world"></i> Countries</a>
     <a href="{{ route('backend.settings') }}" class="nav-item {{ Route::is('backend.settings') ? 'active' : '' }}"><i class="ti ti-settings"></i> Settings</a>
   </div>
   <div class="sidebar-footer">

@@ -164,9 +164,9 @@
         <div class="card-head"><div class="card-title">Target Audience</div></div>
         <div class="card-body">
           <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Gender Selection <span>*</span></label>
-            <select name="gender" class="form-input" required>
-              <option value="unisex" {{ old('gender') == 'unisex' ? 'selected' : '' }}>Unisex (Both)</option>
+            <label class="form-label">Gender Selection</label>
+            <select name="gender" class="form-input">
+              <option value="unisex" {{ old('gender', 'unisex') == 'unisex' ? 'selected' : '' }}>Unisex (Both)</option>
               <option value="men" {{ old('gender') == 'men' ? 'selected' : '' }}>Men (M)</option>
               <option value="women" {{ old('gender') == 'women' ? 'selected' : '' }}>Women (F)</option>
             </select>

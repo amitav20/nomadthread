@@ -24,6 +24,7 @@
       productShow: "{{ route('shop.product', ['sku' => 'PLACEHOLDER']) }}",
       assetBaseUrl: "{{ asset('') }}"
     };
+    window.countries = @json($sharedCountries);
   </script>
 </head>
 <body>
@@ -49,7 +50,7 @@
         <span>Subtotal</span>
         <span class="cart-total-num" id="cartTotal">₹0</span>
       </div>
-      <button class="btn-checkout" onclick="showToast('Checkout flow simulated!')">Proceed to Checkout</button>
+      <a href="{{ route('checkout') }}" class="btn-checkout" style="text-decoration:none; display:flex; align-items:center; justify-content:center; text-align:center;">Proceed to Checkout</a>
       <button class="btn-continue" onclick="closeCart()">Continue Shopping</button>
     </div>
   </div>
@@ -91,8 +92,20 @@
   <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg">Added to cart</span></div>
 
   <!-- TOP BAR -->
-  <div class="top-bar">
-    {!! $siteSettings['top_bar_text'] ?? '<span>✦</span> Free shipping on orders above ₹5,000 &nbsp;|&nbsp; Handcrafted with full-grain leather &nbsp;|&nbsp; <span>✦</span> 10% off on first order — Use CRAFT10' !!}
+  <div class="top-bar" style="padding: 10px 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;">
+      <div style="text-align: left; flex-grow: 1;">
+        {!! $siteSettings['top_bar_text'] ?? '<span>✦</span> Free shipping on orders above ₹5,000 &nbsp;|&nbsp; Handcrafted with full-grain leather &nbsp;|&nbsp; <span>✦</span> 10% off on first order — Use CRAFT10' !!}
+      </div>
+      <div class="country-selector-wrap" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+        <span style="font-size: 11px; font-family: 'Jost', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: var(--cream);">Country:</span>
+        <select id="countrySelector" onchange="changeCountryCode(this.value)" style="background: rgba(26,17,11,0.85); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 12px; padding: 4px 8px; border-radius: 4px; cursor: pointer; outline: none; transition: border-color 0.2s;">
+          @foreach($sharedCountries as $country)
+            <option value="{{ $country->code }}">{{ $country->name }} ({{ $country->currency_code }} {{ $country->currency_symbol }})</option>
+          @endforeach
+        </select>
+      </div>
+    </div>
   </div>
 
   <!-- HEADER -->

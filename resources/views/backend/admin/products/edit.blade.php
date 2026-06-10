@@ -165,8 +165,8 @@
         <div class="card-head"><div class="card-title">Target Audience</div></div>
         <div class="card-body">
           <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Gender Selection <span>*</span></label>
-            <select name="gender" class="form-input" required>
+            <label class="form-label">Gender Selection</label>
+            <select name="gender" class="form-input">
               <option value="unisex" {{ old('gender', $product->gender) == 'unisex' ? 'selected' : '' }}>Unisex (Both)</option>
               <option value="men" {{ old('gender', $product->gender) == 'men' ? 'selected' : '' }}>Men (M)</option>
               <option value="women" {{ old('gender', $product->gender) == 'women' ? 'selected' : '' }}>Women (F)</option>

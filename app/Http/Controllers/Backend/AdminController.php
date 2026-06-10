@@ -808,4 +808,50 @@ class AdminController extends Controller
         }
         return redirect()->route('backend.settings')->with('success', 'Settings updated successfully.');
     }
+
+    public function countriesIndex()
+    {
+        $countries = \App\Models\Country::orderBy('id', 'desc')->get();
+        return view('backend.admin.countries', compact('countries'));
+    }
+
+    public function countriesStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10|unique:countries,code',
+            'currency_code' => 'required|string|max:10',
+            'currency_symbol' => 'required|string|max:10',
+            'exchange_rate' => 'required|numeric|min:0',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        \App\Models\Country::create($request->all());
+
+        return redirect()->route('backend.countries.index')->with('success', 'Country added successfully.');
+    }
+
+    public function countriesUpdate(Request $request, $id)
+    {
+        $country = \App\Models\Country::findOrFail($id);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10|unique:countries,code,' . $id,
+            'currency_code' => 'required|string|max:10',
+            'currency_symbol' => 'required|string|max:10',
+            'exchange_rate' => 'required|numeric|min:0',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        $country->update($request->all());
+
+        return redirect()->route('backend.countries.index')->with('success', 'Country updated successfully.');
+    }
+
+    public function countriesDestroy($id)
+    {
+        $country = \App\Models\Country::findOrFail($id);
+        $country->delete();
+        return redirect()->route('backend.countries.index')->with('success', 'Country deleted successfully.');
+    }
 }

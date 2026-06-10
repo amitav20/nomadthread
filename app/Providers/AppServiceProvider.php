@@ -42,6 +42,12 @@ class AppServiceProvider extends ServiceProvider
             } else {
                 $view->with('siteSettings', []);
             }
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('countries')) {
+                $view->with('sharedCountries', \App\Models\Country::where('status', 'active')->get());
+            } else {
+                $view->with('sharedCountries', collect());
+            }
         });
     }
 }

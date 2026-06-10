@@ -69,11 +69,76 @@
     </div>
 
     <!-- Gender Filter Bar -->
-    <div class="gender-filter-bar reveal visible">
+    <div class="gender-filter-bar reveal visible" style="margin-bottom: 15px;">
       <span class="gender-label">Collection For:</span>
       <button onclick="filterByGender('all')" class="gender-btn active" id="gender-all">All</button>
       <button onclick="filterByGender('men')" class="gender-btn" id="gender-men">Men</button>
       <button onclick="filterByGender('women')" class="gender-btn" id="gender-women">Women</button>
+    </div>
+
+    <!-- Toggle Advanced Filters -->
+    <div class="reveal visible" style="text-align: center; margin-bottom: 30px;">
+      <button id="filterPanelToggleBtn" onclick="toggleFilterPanel()" class="gender-btn" style="background: transparent; border: 1px solid var(--border); color: var(--gold); padding: 8px 20px; font-family: 'Jost', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+        Filter Catalog &darr;
+      </button>
+    </div>
+
+    <!-- Advanced Filter Panel -->
+    <div id="advancedFilterPanel" class="reveal visible" style="display: none; background: var(--bg-card); border: 1px solid var(--border); padding: 25px; margin-bottom: 40px; border-radius: 8px; transition: all 0.3s ease;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        
+        <!-- Search -->
+        <div>
+          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Search</h5>
+          <input type="text" id="filterSearchInput" oninput="handleSearchInput(this.value)" placeholder="Search products..." style="width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; border-radius: 4px;">
+        </div>
+
+        <!-- Price Range -->
+        <div>
+          <h5 style="font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">
+            Max Price: <span id="priceRangeLabel" style="color: var(--gold);">₹50,000</span>
+          </h5>
+          <input type="range" id="filterPriceRange" min="1000" max="50000" step="500" value="50000" oninput="updatePriceLabel(this.value); triggerFilters();" style="width: 100%; accent-color: var(--gold); cursor: pointer; background: var(--border); height: 4px; border-radius: 2px; outline: none;">
+          <div style="display: flex; justify-content: space-between; font-size: 10px; font-family: 'Jost', sans-serif; color: var(--text-light); margin-top: 5px;">
+            <span>₹1,000</span>
+            <span>₹50,000</span>
+          </div>
+        </div>
+
+        <!-- Sort By -->
+        <div>
+          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Sort By</h5>
+          <select id="filterSortSelect" onchange="handleSortSelect(this.value)" style="width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; border-radius: 4px; cursor: pointer;">
+            <option value="default">Default Sorting</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name-az">Name: A-Z</option>
+            <option value="newest">Newest Arrivals</option>
+          </select>
+        </div>
+
+        <!-- Filter Colors -->
+        <div>
+          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Colors</h5>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-height: 38px;">
+            @php
+              $allColors = ['tan', 'espresso', 'cognac', 'black', 'olive', 'wine', 'camel', 'slate'];
+            @endphp
+            @foreach($allColors as $c)
+              <div onclick="toggleColorFilter('{{ $c }}', this)" class="filter-color-btn" style="width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="{{ ucfirst($c) }}">
+                <div class="swatch-{{ $c }}" style="width: 18px; height: 18px; border-radius: 50%;"></div>
+              </div>
+            @endforeach
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px;">
+        <button onclick="resetFilters()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 16px; font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)'">
+          Clear Filters
+        </button>
+      </div>
     </div>
 
     <div class="product-grid" id="productGrid">
@@ -134,64 +199,10 @@
   </div>
 </section>
 
-<script>
-  function filterByGender(gender) {
-    // Update button active state
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    const activeBtn = document.getElementById('gender-' + gender);
-    if (activeBtn) {
-      activeBtn.classList.add('active');
-    }
-
-    // Filter cards
-    const cards = document.querySelectorAll('.product-card');
-    let count = 0;
-    cards.forEach(card => {
-      const productGender = card.getAttribute('data-gender') || 'unisex';
-      if (gender === 'all') {
-        card.style.display = 'block';
-        count++;
-      } else if (gender === 'men') {
-        if (productGender === 'men' || productGender === 'unisex') {
-          card.style.display = 'block';
-          count++;
-        } else {
-          card.style.display = 'none';
-        }
-      } else if (gender === 'women') {
-        if (productGender === 'women' || productGender === 'unisex') {
-          card.style.display = 'block';
-          count++;
-        } else {
-          card.style.display = 'none';
-        }
-      }
-    });
-
-    // Handle empty state message if no products match
-    let emptyMsg = document.getElementById('noProductsGenderMsg');
-    if (count === 0) {
-      if (!emptyMsg) {
-        emptyMsg = document.createElement('div');
-        emptyMsg.id = 'noProductsGenderMsg';
-        emptyMsg.style.gridColumn = '1/-1';
-        emptyMsg.style.textAlign = 'center';
-        emptyMsg.style.padding = '80px 20px';
-        emptyMsg.style.fontFamily = "'Cormorant Garamond', serif";
-        emptyMsg.style.fontSize = '24px';
-        emptyMsg.style.color = 'var(--text-light)';
-        emptyMsg.innerText = 'No products found for this selection.';
-        document.getElementById('productGrid').appendChild(emptyMsg);
-      } else {
-        emptyMsg.style.display = 'block';
-      }
-    } else {
-      if (emptyMsg) {
-        emptyMsg.style.display = 'none';
-      }
-    }
+<style>
+  .filter-color-btn.active {
+    border-color: var(--gold) !important;
+    transform: scale(1.15);
   }
-</script>
+</style>
 @endsection

@@ -31,6 +31,9 @@ Route::prefix('api')->name('api.')->group(function () {
 Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/category/{slug}', [ProductController::class, 'category'])->name('shop.category');
 Route::get('/product/{sku}', [ProductController::class, 'show'])->name('shop.product');
+Route::get('/checkout', [ProductController::class, 'checkout'])->name('checkout');
+Route::post('/checkout/submit', [ProductController::class, 'submitCheckout'])->name('checkout.submit');
+Route::get('/order-confirmation/{order_number}', [ProductController::class, 'orderConfirmation'])->name('order.confirmation');
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +99,11 @@ Route::prefix('backend')->name('backend.')->middleware('admin')->group(function 
     Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [AdminController::class, 'settingsUpdate'])->name('settings.update');
+    
+    Route::get('/countries', [AdminController::class, 'countriesIndex'])->name('countries.index');
+    Route::post('/countries', [AdminController::class, 'countriesStore'])->name('countries.store');
+    Route::put('/countries/{id}', [AdminController::class, 'countriesUpdate'])->name('countries.update');
+    Route::delete('/countries/{id}', [AdminController::class, 'countriesDestroy'])->name('countries.destroy');
 });
 
 
