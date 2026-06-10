@@ -3,18 +3,16 @@
 @section('title', 'Secure Checkout | Nomad Thread')
 
 @section('content')
-<section class="checkout-section" style="padding-top: 140px; padding-bottom: 80px; min-height: 85vh; background: var(--bg);">
-  <div class="section-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+<section class="checkout-section">
+  <div class="section-inner">
     
-    <div style="margin-bottom: 30px;">
-      <a href="{{ route('shop.index') }}" style="color: var(--gold); text-decoration: none; font-size: 14px; font-family: 'Jost', sans-serif;">&larr; Return to Catalog</a>
-    </div>
+    <a href="{{ route('shop.index') }}" class="checkout-back-link">&larr; Return to Catalog</a>
 
-    <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 500; color: var(--cream); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+    <h1 class="checkout-page-title">
       🔒 <em>Secure Checkout</em>
     </h1>
 
-    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 50px; align-items: start;">
+    <div class="checkout-grid">
       
       <!-- LEFT COLUMN: SHIPPING & PAYMENT -->
       <div>
@@ -22,31 +20,31 @@
           @csrf
           
           <!-- Shipping Address Card -->
-          <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: 8px; margin-bottom: 30px;">
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-              <span style="color:var(--gold)">1.</span> Shipping Information
+          <div class="checkout-card">
+            <h3 class="checkout-card-title">
+              <span class="step-num">1.</span> Shipping Information
             </h3>
             
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="checkout-form-row">
+              <div class="checkout-form-cols-2">
                 <div>
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Full Name *</label>
-                  <input type="text" name="customer_name" required placeholder="e.g. Priyesh Patel" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px;">
+                  <label class="checkout-label">Full Name *</label>
+                  <input type="text" name="customer_name" required placeholder="e.g. Priyesh Patel" class="checkout-input">
                 </div>
                 <div>
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Email Address *</label>
-                  <input type="email" name="customer_email" required placeholder="e.g. priyesh@example.com" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px;">
+                  <label class="checkout-label">Email Address *</label>
+                  <input type="email" name="customer_email" required placeholder="e.g. priyesh@example.com" class="checkout-input">
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+              <div class="checkout-form-cols-mixed">
                 <div>
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Phone Number *</label>
-                  <input type="tel" name="customer_phone" required placeholder="e.g. +91 98765 43210" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px;">
+                  <label class="checkout-label">Phone Number *</label>
+                  <input type="tel" name="customer_phone" required placeholder="e.g. +91 98765 43210" class="checkout-input">
                 </div>
                 <div>
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Shipping Country *</label>
-                  <select id="checkoutCountrySelector" onchange="changeCountryCode(this.value)" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px; cursor: pointer;">
+                  <label class="checkout-label">Shipping Country *</label>
+                  <select id="checkoutCountrySelector" onchange="changeCountryCode(this.value)" class="checkout-select">
                     @foreach($sharedCountries as $c)
                       <option value="{{ $c->code }}">{{ $c->name }}</option>
                     @endforeach
@@ -55,88 +53,88 @@
               </div>
 
               <div>
-                <label style="display: block; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Delivery Address *</label>
-                <textarea name="shipping_address" required rows="3" placeholder="Apartment, Suite, Street name, City, Pin code" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px; resize: none;"></textarea>
+                <label class="checkout-label">Delivery Address *</label>
+                <textarea name="shipping_address" required rows="3" placeholder="Apartment, Suite, Street name, City, Pin code" class="checkout-textarea"></textarea>
               </div>
             </div>
           </div>
 
           <!-- Payment Card -->
-          <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: 8px; margin-bottom: 30px;">
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-              <span style="color:var(--gold)">2.</span> Payment Details
+          <div class="checkout-card">
+            <h3 class="checkout-card-title">
+              <span class="step-num">2.</span> Payment Details
             </h3>
-            <p style="font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px;">
+            <p class="checkout-encrypt-notice">
               🔒 256-Bit SSL Encrypted Connection
             </p>
 
             <!-- Static Payment Methods -->
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px;">
-              <label class="payment-method-label active" style="border: 1px solid var(--gold); background: rgba(201, 168, 76, 0.05); padding: 12px 6px; border-radius: 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+            <div class="checkout-payment-methods">
+              <label class="payment-method-label active">
                 <input type="radio" name="payment_method" value="Credit Card" checked style="display:none;">
-                <span style="font-size: 18px;">💳</span>
-                <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--cream); text-transform: uppercase; font-weight: 500;">Card</span>
+                <span class="pm-icon">💳</span>
+                <span class="pm-text">Card</span>
               </label>
-              <label class="payment-method-label" onclick="selectPaymentMethod('UPI', this)" style="border: 1px solid var(--border); padding: 12px 6px; border-radius: 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+              <label class="payment-method-label" onclick="selectPaymentMethod('UPI', this)">
                 <input type="radio" name="payment_method" value="UPI" style="display:none;">
-                <span style="font-size: 18px;">📱</span>
-                <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--cream); text-transform: uppercase; font-weight: 500;">UPI</span>
+                <span class="pm-icon">📱</span>
+                <span class="pm-text">UPI</span>
               </label>
-              <label class="payment-method-label" onclick="selectPaymentMethod('Net Banking', this)" style="border: 1px solid var(--border); padding: 12px 6px; border-radius: 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+              <label class="payment-method-label" onclick="selectPaymentMethod('Net Banking', this)">
                 <input type="radio" name="payment_method" value="Net Banking" style="display:none;">
-                <span style="font-size: 18px;">🏦</span>
-                <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--cream); text-transform: uppercase; font-weight: 500;">NetBank</span>
+                <span class="pm-icon">🏦</span>
+                <span class="pm-text">NetBank</span>
               </label>
-              <label class="payment-method-label" onclick="selectPaymentMethod('COD', this)" style="border: 1px solid var(--border); padding: 12px 6px; border-radius: 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+              <label class="payment-method-label" onclick="selectPaymentMethod('COD', this)">
                 <input type="radio" name="payment_method" value="COD" style="display:none;">
-                <span style="font-size: 18px;">📦</span>
-                <span style="font-family: 'Jost', sans-serif; font-size: 10px; color: var(--cream); text-transform: uppercase; font-weight: 500;">COD</span>
+                <span class="pm-icon">📦</span>
+                <span class="pm-text">COD</span>
               </label>
             </div>
 
             <!-- Credit Card Form -->
             <div id="creditCardDetails">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label style="display: block; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Cardholder Name</label>
-                <input type="text" id="cardName" placeholder="Name on card" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px;">
+              <div style="margin-bottom: 15px;">
+                <label class="checkout-label">Cardholder Name</label>
+                <input type="text" id="cardName" placeholder="Name on card" class="checkout-input">
               </div>
 
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label style="display: block; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Card Number</label>
-                <div style="position: relative;">
-                  <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this)" style="width: 100%; padding: 12px; padding-right: 45px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px; letter-spacing: 2px;">
-                  <span id="cardIcon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px;">💳</span>
+              <div style="margin-bottom: 15px;">
+                <label class="checkout-label">Card Number</label>
+                <div class="card-field-wrap">
+                  <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this)" class="checkout-input card-number">
+                  <span id="cardIcon" class="card-icon">💳</span>
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Expiration Date</label>
-                  <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px; text-align: center; letter-spacing: 1px;">
+              <div class="checkout-form-cols-2">
+                <div>
+                  <label class="checkout-label">Expiration Date</label>
+                  <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" class="checkout-input card-expiry">
                 </div>
-                <div class="form-group">
-                  <label style="display: block; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">CVV Security Code</label>
-                  <input type="password" id="cardCvv" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; border-radius: 4px; text-align: center; letter-spacing: 3px;">
+                <div>
+                  <label class="checkout-label">CVV Security Code</label>
+                  <input type="password" id="cardCvv" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="checkout-input card-cvv">
                 </div>
               </div>
             </div>
 
             <!-- Alternative Methods Info -->
-            <div id="alternativePaymentDetails" style="display: none; padding: 20px; background: rgba(26,17,11,0.5); border: 1px dashed var(--border); border-radius: 6px; text-align: center; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text-light);">
+            <div id="alternativePaymentDetails" class="alt-payment-box" style="display: none;">
               <span id="alternativePaymentText">Selected payment method requires redirection or validation upon submission.</span>
             </div>
 
           </div>
 
           <!-- Checkout Security Badges -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; gap: 15px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light);">
+          <div class="checkout-security-badges">
+            <div class="badge-item">
               <span>🛡️</span> PCI-DSS Compliant Gateway
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light);">
+            <div class="badge-item">
               <span>🔒</span> 256-Bit SSL Encryption
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text-light);">
+            <div class="badge-item">
               <span>✅</span> Norton Secured
             </div>
           </div>
@@ -145,37 +143,37 @@
       </div>
 
       <!-- RIGHT COLUMN: ORDER SUMMARY -->
-      <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: 8px; position: sticky; top: 120px;">
-        <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+      <div class="checkout-summary-card">
+        <h3 class="checkout-summary-title">
           Order Summary
         </h3>
 
         <!-- Checkout Items -->
-        <div id="checkoutSummaryItems" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; padding-right: 5px;">
+        <div id="checkoutSummaryItems" class="checkout-summary-items">
           <!-- Items populated via JS -->
         </div>
 
         <!-- Price Totals -->
-        <div style="border-top: 1px solid var(--border); padding-top: 15px; display: flex; flex-direction: column; gap: 10px; font-family: 'Jost', sans-serif; font-size: 13.5px;">
-          <div style="display: flex; justify-content: space-between; color: var(--text-light);">
+        <div class="checkout-totals">
+          <div class="checkout-total-row">
             <span>Subtotal</span>
-            <span id="summarySubtotal" style="color: var(--cream);">₹0</span>
+            <span id="summarySubtotal">₹0</span>
           </div>
-          <div style="display: flex; justify-content: space-between; color: var(--text-light);">
+          <div class="checkout-total-row">
             <span>VAT / GST (18%)</span>
-            <span id="summaryTax" style="color: var(--cream);">₹0</span>
+            <span id="summaryTax">₹0</span>
           </div>
-          <div style="display: flex; justify-content: space-between; color: var(--text-light);">
+          <div class="checkout-total-row">
             <span>Delivery Courier</span>
-            <span id="summaryShipping" style="color: var(--cream);">₹500</span>
+            <span id="summaryShipping">₹500</span>
           </div>
-          <div style="display: flex; justify-content: space-between; color: var(--text-light); font-weight: 600; border-top: 1px solid var(--border); padding-top: 12px; font-size: 16px;">
-            <span style="color: var(--cream);">Total</span>
-            <span id="summaryTotal" style="color: var(--gold);">₹0</span>
+          <div class="checkout-total-row grand-total">
+            <span>Total</span>
+            <span id="summaryTotal">₹0</span>
           </div>
         </div>
 
-        <button type="submit" form="checkoutForm" class="btn-checkout" style="width: 100%; border: none; padding: 16px; background: var(--gold); color: var(--bg); font-family: 'Jost', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 25px; display: block; text-align: center; border-radius: 4px;">
+        <button type="submit" form="checkoutForm" class="btn-checkout-pay">
           🔒 Pay Securely — <span id="checkoutButtonTotal">₹0</span>
         </button>
       </div>
@@ -221,17 +219,6 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
   }
-  
-  .payment-method-label {
-    transition: all 0.2s ease;
-  }
-  .payment-method-label:hover {
-    border-color: var(--gold) !important;
-  }
-  .payment-method-label.active {
-    border-color: var(--gold) !important;
-    background: rgba(201, 168, 76, 0.08) !important;
-  }
 </style>
 
 <script>
@@ -243,13 +230,9 @@
     // Manage active states
     document.querySelectorAll('.payment-method-label').forEach(lbl => {
       lbl.classList.remove('active');
-      lbl.style.borderColor = 'var(--border)';
-      lbl.style.background = 'transparent';
     });
     
     el.classList.add('active');
-    el.style.borderColor = 'var(--gold)';
-    el.style.background = 'rgba(201, 168, 76, 0.08)';
     
     // Toggle Card details form
     const cardForm = document.getElementById('creditCardDetails');
@@ -341,7 +324,7 @@
               ? `<img src="${getAssetUrl(item.image_path)}" style="width:100%; height:100%; object-fit:cover;">`
               : `<div class="product-visual cart-item-mini ${item.shape || 'bag-shape'} color-${item.color}" style="width:100%; height:100%;"></div>`
             }
-            <span style="position:absolute; -right:5px; -top:5px; background:var(--gold); color:var(--bg); border-radius:50%; font-size:9px; font-weight:600; width:15px; height:15px; display:flex; align-items:center; justify-content:center;">${item.qty}</span>
+            <span style="position:absolute; right:-2px; top:-2px; background:var(--gold); color:var(--bg); border-radius:50%; font-size:9px; font-weight:600; width:15px; height:15px; display:flex; align-items:center; justify-content:center;">${item.qty}</span>
           </div>
           <div>
             <div style="color:var(--cream); font-weight:500;">${item.name}</div>
