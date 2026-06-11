@@ -83,6 +83,12 @@ class DatabaseService
                 $table->timestamp('created_at')->useCurrent();
             });
         }
+
+        if (Schema::hasTable('orders') && !Schema::hasColumn('orders', 'user_id')) {
+            Schema::table('orders', function ($table) {
+                $table->unsignedBigInteger('user_id')->nullable()->after('id');
+            });
+        }
     }
 
     /**

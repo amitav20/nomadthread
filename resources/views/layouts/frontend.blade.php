@@ -150,11 +150,24 @@
 
         <a href="{{ Route::is('home') ? '#about' : route('home').'#about' }}" class="nav-item">Our Craft</a>
         <a href="{{ route('threads.index') }}" class="nav-item {{ Route::is('threads.*') ? 'active' : '' }}">Discussions</a>
+        @auth
+          <a href="{{ route('my.orders') }}" class="nav-item {{ Route::is('my.orders') ? 'active' : '' }}">My Orders</a>
+        @endauth
       </nav>
       <div class="header-actions">
         <button class="icon-btn" title="Search" onclick="showToast('Search modal simulated!')">⌕</button>
         <button class="icon-btn" title="Wishlist" onclick="showToast('Your wishlist contains 0 items.')">♡</button>
-        <a href="{{ route('backend.dashboard') }}" class="icon-btn" title="Admin Dashboard" style="text-decoration:none">⊙</a>
+        @auth
+          @if(Auth::user()->role === 'admin')
+            <a href="{{ route('backend.dashboard') }}" class="icon-btn" title="Admin Dashboard" style="text-decoration:none">⊙</a>
+          @endif
+          <form action="{{ route('logout') }}" method="POST" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
+            @csrf
+            <button type="submit" class="icon-btn" title="Logout" style="background:none; border:none; cursor:pointer; font-size:18px;">⏻</button>
+          </form>
+        @else
+          <a href="{{ route('login') }}" class="icon-btn" title="Login" style="text-decoration:none">👤</a>
+        @endauth
         <button class="icon-btn" title="Cart" onclick="openCart()" style="position:relative">
           🛍
           <span class="cart-count" id="cartBadge">0</span>

@@ -85,4 +85,98 @@ class AuthController extends Controller
 
         return redirect()->route('backend.login')->with('success', 'Logged out successfully.');
     }
+
+    /**
+     * Show the customer login form.
+     */
+    public function showCustomerLoginForm()
+    {
+        \App\Services\DatabaseService::getConnection();
+
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        return view('frontend.auth.login');
+    }
+
+    /**
+     * Handle customer login submission.
+     */
+    public function customerLogin(Request $request)
+    {
+        \App\Services\DatabaseService::getConnection();
+
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            
+            // Redirect admin to admin dashboard, regular user to home
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('backend.dashboard')->with('success', 'Logged in as Admin.');
+            }
+            
+            return redirect()->route('home')->with('success', 'Logged in successfully.');
+        }
+
+        throw ValidationException::withMessages([
+            'email' => 'These credentials do not match our records.',
+        ]);
+    }
+
+    /**
+     * Show the customer registration form.
+     */
+    public function showCustomerRegisterForm()
+    {
+        \App\Services\DatabaseService::getConnection();
+
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        return view('frontend.auth.register');
+    }
+
+    /**
+     * Handle customer registration submission.
+     */
+    public function customerRegister(Request $request)
+    {
+        \App\Services\DatabaseService::getConnection();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = \App\Models\User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => 'user',
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->route('home')->with('success', 'Account created successfully!');
+    }
+
+    /**
+     * Log the customer out.
+     */
+    public function customerLogout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('success', 'Logged out successfully.');
+    }
 }

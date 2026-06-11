@@ -45,6 +45,16 @@ Route::get('/threads', [FrontThreadController::class, 'index'])->name('threads.i
 Route::get('/threads/{id}', [FrontThreadController::class, 'show'])->name('threads.show');
 Route::get('/pages/{slug}', [HomeController::class, 'showPage'])->name('pages.show');
 
+Route::get('/login', [AuthController::class, 'showCustomerLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'customerLogin'])->name('login.submit');
+Route::get('/register', [AuthController::class, 'showCustomerRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'customerRegister'])->name('register.submit');
+Route::post('/logout', [AuthController::class, 'customerLogout'])->name('logout');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/my-orders', [ProductController::class, 'myOrders'])->name('my.orders');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Backend Admin Routes

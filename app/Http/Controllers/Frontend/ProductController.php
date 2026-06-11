@@ -103,8 +103,29 @@ class ProductController extends Controller
 
         $orderNumber = 'ORD-' . rand(100000, 999999);
 
+        // Find or create User for customer email to support automatic login
+        $user = null;
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+        } else {
+            // Find user by email or create a new one
+            $email = $request->customer_email;
+            $user = \App\Models\User::where('email', $email)->first();
+            if (!$user) {
+                $user = \App\Models\User::create([
+                    'name' => $request->customer_name,
+                    'email' => $email,
+                    'password' => \Illuminate\Support\Facades\Hash::make('password'), // default password
+                    'role' => 'user',
+                ]);
+            }
+            // Auto-login the user
+            \Illuminate\Support\Facades\Auth::login($user);
+        }
+
         // Save order to the database
         $order = \App\Models\Order::create([
+            'user_id' => $user->id,
             'order_number' => $orderNumber,
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
@@ -136,5 +157,20 @@ class ProductController extends Controller
         $categoriesResponse = $this->api->categories();
         $categories = json_decode($categoriesResponse->getContent(), true)['data'] ?? [];
         return view('frontend.shop.confirmation', compact('order', 'categories'));
+    }
+
+    /**
+     * Show customer orders history.
+     */
+    public function myOrders(Request $request)
+    {
+        $orders = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->orderBy('id', 'desc')
+            ->get();
+            
+        $categoriesResponse = $this->api->categories();
+        $categories = json_decode($categoriesResponse->getContent(), true)['data'] ?? [];
+        
+        return view('frontend.shop.my_orders', compact('orders', 'categories'));
     }
 }
