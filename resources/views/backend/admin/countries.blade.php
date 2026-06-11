@@ -26,12 +26,22 @@
   
   <!-- LEFT COLUMN: COUNTRIES LIST -->
   <div class="card">
-    <div class="card-head">
-      <div class="card-title">
+    <div class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="card-title" style="margin-bottom: 0;">
         <i class="ti ti-world" style="margin-right:8px;color:var(--gold)"></i>Active Countries & Currencies
       </div>
+      <form action="{{ route('backend.countries.sync_rates') }}" method="POST" style="margin: 0;">
+        @csrf
+        <button type="submit" class="btn btn-gold" style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+          <i class="ti ti-refresh"></i> Sync Rates with API
+        </button>
+      </form>
     </div>
     <div class="card-body" style="padding: 0;">
+      <div style="background: rgba(201, 168, 76, 0.08); border-left: 3px solid var(--gold); padding: 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--text2); margin: 15px 18px; border-radius: 0 4px 4px 0; display: flex; align-items: center;">
+        <i class="ti ti-info-circle" style="color: var(--gold); margin-right: 8px; font-size: 16px;"></i>
+        <span><strong>Frankfurter API Integration:</strong> Exchange rates are synced automatically daily (base: INR). Unsupported currencies (like <strong>AED</strong>) can be adjusted manually here.</span>
+      </div>
       <table style="width: 100%; border-collapse: collapse; font-family: 'DM Sans', sans-serif; font-size: 13.5px;">
         <thead>
           <tr style="background: var(--bg3); border-bottom: 1px solid var(--border); text-align: left;">

@@ -811,6 +811,21 @@ class AdminController extends Controller
 
     public function countriesIndex()
     {
+        // Silent auto-sync: Run sync automatically if last sync was more than 24 hours ago
+        if (!\Illuminate\Support\Facades\Cache::has('last_currency_sync')) {
+            // Set cache immediately to prevent concurrent requests from hitting the API
+            \Illuminate\Support\Facades\Cache::put('last_currency_sync', now(), now()->addDay());
+            
+            // Try to sync in a try-catch block so failures don't block loading the index page
+            try {
+                \App\Services\CurrencyService::syncExchangeRates();
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Silent currency sync failed: ' . $e->getMessage());
+                // Forget cache so it tries again next time
+                \Illuminate\Support\Facades\Cache::forget('last_currency_sync');
+            }
+        }
+
         $countries = \App\Models\Country::orderBy('id', 'desc')->get();
         return view('backend.admin.countries', compact('countries'));
     }
@@ -853,5 +868,25 @@ class AdminController extends Controller
         $country = \App\Models\Country::findOrFail($id);
         $country->delete();
         return redirect()->route('backend.countries.index')->with('success', 'Country deleted successfully.');
+    }
+
+    public function countriesSyncRates(Request $request)
+    {
+        $result = \App\Services\CurrencyService::syncExchangeRates();
+
+        if ($result['success']) {
+            $updatedList = implode(', ', $result['updated']);
+            $skippedMsg = !empty($result['skipped']) ? ' (Skipped/retained unsupported: ' . implode(', ', $result['skipped']) . ')' : '';
+            
+            // Update the cache timestamp to avoid automatic syncing for the next 24 hours
+            \Illuminate\Support\Facades\Cache::put('last_currency_sync', now(), now()->addDay());
+
+            return redirect()->route('backend.countries.index')
+                ->with('success', "Exchange rates synced successfully from Frankfurter API! Updated: {$updatedList}{$skippedMsg}");
+        }
+
+        $errorMsg = implode('; ', $result['errors']);
+        return redirect()->route('backend.countries.index')
+            ->withErrors("Failed to sync exchange rates: {$errorMsg}");
     }
 }

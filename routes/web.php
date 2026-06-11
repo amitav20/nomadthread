@@ -101,6 +101,7 @@ Route::prefix('backend')->name('backend.')->middleware('admin')->group(function 
     Route::post('/settings', [AdminController::class, 'settingsUpdate'])->name('settings.update');
     
     Route::get('/countries', [AdminController::class, 'countriesIndex'])->name('countries.index');
+    Route::post('/countries/sync-rates', [AdminController::class, 'countriesSyncRates'])->name('countries.sync_rates');
     Route::post('/countries', [AdminController::class, 'countriesStore'])->name('countries.store');
     Route::put('/countries/{id}', [AdminController::class, 'countriesUpdate'])->name('countries.update');
     Route::delete('/countries/{id}', [AdminController::class, 'countriesDestroy'])->name('countries.destroy');
