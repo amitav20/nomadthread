@@ -140,6 +140,15 @@ function getColorClass(colorName) {
   return map[colorName] || 'color-tan';
 }
 
+function filterProducts(category, btn) {
+  if (btn) {
+    const buttons = btn.closest('.filter-bar').querySelectorAll('.filter-btn');
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderProducts(category);
+}
+
 function renderProducts(categoryFilter = 'all') {
   const grid = document.getElementById('productGrid');
   if (!grid) return;
@@ -149,7 +158,11 @@ function renderProducts(categoryFilter = 'all') {
 
   // Category filter
   if (categoryFilter !== 'all') {
-    filtered = filtered.filter(p => p.category_slug === categoryFilter);
+    if (categoryFilter === 'new') {
+      filtered = filtered.filter(p => p.badge === 'new');
+    } else {
+      filtered = filtered.filter(p => p.category_slug === categoryFilter);
+    }
   }
 
   // Search filter
