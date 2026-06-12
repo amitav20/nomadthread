@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <!-- Premium Artisan Stylesheet -->
-  <link href="{{ asset('css/ecommerce.css') }}" rel="stylesheet" />
+  <link href="{{ asset('css/ecommerce.css') }}?v={{ time() }}" rel="stylesheet" />
 
   <style>
     .mega-menu {
@@ -117,7 +117,7 @@
         @else
           <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px;">
         @endif
-        <span class="logo" style="color: #dfc049;">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
+        <span class="logo" style="color: var(--sage);">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
       </a>
       <nav>
         <a href="{{ route('home') }}" class="nav-item {{ Route::is('home') ? 'active' : '' }}">Home</a>
@@ -247,6 +247,6 @@
   <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
   <!-- Interactive JavaScript -->
-  <script src="{{ asset('js/ecommerce.js') }}"></script>
+  <script src="{{ asset('js/ecommerce.js') }}?v={{ time() }}"></script>
 </body>
 </html>
