@@ -45,24 +45,24 @@
   $hasGlobalVideo = !empty($globalVideoUrl);
 @endphp
 
-<section class="hero" id="hero" style="position: relative; overflow: hidden;">
+<section class="hero position-relative overflow-hidden" id="hero">
   
   <!-- Global Hero Background Video (Plays continuously, does not slide or fade) -->
   @if($hasGlobalVideo)
-    <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; z-index: 1; pointer-events: none;">
-      <video autoplay loop muted playsinline style="position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; object-fit: cover; transform: translate(-50%, -50%); opacity: 0.55;">
+    <div class="hero-video-wrap">
+      <video autoplay loop muted playsinline class="hero-video-el">
         <source src="{{ $globalVideoUrl }}" type="video/mp4">
       </video>
     </div>
   @endif
 
   <!-- Slider Wrapper -->
-  <div class="hero-slider-container" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; transform: translate3d(0,0,0); backface-visibility: hidden;">
+  <div class="hero-slider-container">
     @foreach($heroBanners as $index => $banner)
-      <div class="hero-slide" id="hero-slide-{{ $index }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; transition: opacity 0.8s ease-in-out; opacity: {{ $index === 0 ? '1' : '0' }}; pointer-events: {{ $index === 0 ? 'auto' : 'none' }}; z-index: {{ $index === 0 ? '3' : '1' }}; visibility: {{ $index === 0 ? 'visible' : 'hidden' }};">
+      <div class="hero-slide {{ $index === 0 ? 'active' : '' }}" id="hero-slide-{{ $index }}">
         
         <!-- Left Side Content (Green Overlaid on Global Video) -->
-        <div class="hero-left" style="background: {{ $hasGlobalVideo ? 'rgba(16, 38, 16, 0.85)' : 'var(--espresso)' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden;">
+        <div class="hero-left {{ $hasGlobalVideo ? 'has-video' : 'no-video' }}">
           <div class="hero-tag">New Collection 2026</div>
           <h1>{!! $banner['title'] !!}</h1>
           <p class="hero-desc">{{ $banner['subheadline'] }}</p>
@@ -73,24 +73,24 @@
         </div>
 
         <!-- Right Side Media & Slider Card (Chocolate Overlaid on Global Video) -->
-        <div class="hero-right" style="position: relative; height: 100%; background: {{ $hasGlobalVideo ? 'rgba(44, 26, 14, 0.7)' : 'transparent' }}; backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; -webkit-backdrop-filter: {{ $hasGlobalVideo ? 'blur(8px)' : 'none' }}; z-index: 2; transform: translate3d(0,0,0); backface-visibility: hidden;">
+        <div class="hero-right {{ $hasGlobalVideo ? 'has-video' : 'no-video' }}">
           
           @if(!$hasGlobalVideo)
             <!-- Fallback gradient background when there is no global video -->
-            <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #2c1a0e; z-index: 1;">
-              <div style="position: absolute; inset:0; background: radial-gradient(circle at 60% 50%, rgba(200,169,122,0.15) 0%, rgba(44,26,14,0.9) 100%);"></div>
+            <div class="hero-right-fallback-bg">
+              <div class="hero-right-fallback-radial"></div>
             </div>
           @endif
 
           <!-- Foreground Slider Card -->
-          <div style="position: relative; z-index: 5; display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
-            <div class="hero-product-showcase" style="animation: float 4s ease-in-out infinite;">
+          <div class="hero-right-card-wrap">
+            <div class="hero-product-showcase hero-product-showcase-animate">
               <div class="hero-product-bg"></div>
-              <div class="leather-texture-box" style="background: rgba(44,26,14,0.4); backdrop-filter: blur(8px); border-radius: 8px;">
+              <div class="leather-texture-box hero-texture-box">
                 
                 @if(!empty($banner['image']))
-                  <div style="width: 260px; height: 220px; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow);">
-                    <img src="{{ asset(ltrim($banner['image'], '/')) }}" alt="{{ $banner['title'] }}" style="width: 100%; height: 100%; object-fit: cover;">
+                  <div class="hero-banner-img-wrap">
+                    <img src="{{ asset(ltrim($banner['image'], '/')) }}" alt="{{ $banner['title'] }}" class="hero-banner-img-el">
                   </div>
                 @else
                   <div class="product-silhouette"></div>
@@ -108,14 +108,14 @@
 
   <!-- Hand-written simple Slider Indicators (Dots) -->
   @if(count($heroBanners) > 1)
-    <div class="slider-dots" style="position: absolute; bottom: 40px; left: 80px; z-index: 20; display: flex; gap: 10px;">
+    <div class="slider-dots slider-dots-container">
       @foreach($heroBanners as $index => $banner)
-        <span class="slider-dot" id="slider-dot-{{ $index }}" onclick="goToSlide({{ $index }})" style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--tan-light); cursor: pointer; transition: all 0.3s; opacity: {{ $index === 0 ? '1' : '0.4' }}; background: {{ $index === 0 ? 'var(--tan)' : 'transparent' }};"></span>
+        <span class="slider-dot {{ $index === 0 ? 'active' : '' }}" id="slider-dot-{{ $index }}" onclick="goToSlide({{ $index }})"></span>
       @endforeach
     </div>
   @endif
 
-  <div class="hero-scroll" style="z-index: 20;"><div class="scroll-line"></div> Scroll to Explore</div>
+  <div class="hero-scroll hero-scroll-wrap"><div class="scroll-line"></div> Scroll to Explore</div>
 </section>
 
 <!-- MARQUEE -->
@@ -214,13 +214,13 @@
       @foreach($categories as $cat)
         <a href="{{ route('shop.category', $cat['slug']) }}" class="cat-card">
           @if(!empty($cat['video']))
-            <video src="{{ asset(ltrim($cat['video'], '/')) }}" autoplay loop muted playsinline class="cat-bg" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0; pointer-events:none; z-index:0;"></video>
+            <video src="{{ asset(ltrim($cat['video'], '/')) }}" autoplay loop muted playsinline class="cat-bg cat-bg-video"></video>
           @elseif(!empty($cat['image_thumbnail']))
-            <div class="cat-bg" style="background-image: url('{{ asset(ltrim($cat['image_thumbnail'], '/')) }}'); height:100%; background-size:cover; background-position:center;"></div>
+            <img src="{{ asset(ltrim($cat['image_thumbnail'], '/')) }}" alt="{{ $cat['name'] }}" class="cat-bg cat-img">
           @elseif(!empty($cat['image_banner']))
-            <div class="cat-bg" style="background-image: url('{{ asset(ltrim($cat['image_banner'], '/')) }}'); height:100%; background-size:cover; background-position:center;"></div>
+            <img src="{{ asset(ltrim($cat['image_banner'], '/')) }}" alt="{{ $cat['name'] }}" class="cat-bg cat-img">
           @else
-            <div class="cat-bg {{ $bgMap[$cat['slug']] ?? 'bg-bags' }}" style="height:100%"></div>
+            <div class="cat-bg {{ $bgMap[$cat['slug']] ?? 'bg-bags' }} cat-bg-fill"></div>
           @endif
           <div class="cat-overlay"></div>
           <div class="cat-arrow">↗</div>
@@ -260,9 +260,9 @@
   <div class="featured-inner">
     <div class="featured-content reveal">
       <span class="section-tag">The Nomad Thread Story</span>
-      <h2 class="section-title" style="color:var(--cream)">Where <em>Heritage</em><br>Meets Craft</h2>
-      <p class="section-sub" style="text-align:left">Every Nomad Thread piece begins as raw full-grain hide, selected by hand in our atelier. Skilled artisans spend days cutting, stitching, and finishing each item — no shortcuts, no compromises.</p>
-      <a href="#" class="btn-primary" style="margin-top:4px" onclick="event.preventDefault(); showToast('Our process brochure is downloading!')"><span>Discover Our Process</span></a>
+      <h2 class="section-title featured-title-cream">Where <em>Heritage</em><br>Meets Craft</h2>
+      <p class="section-sub featured-sub-left">Every Nomad Thread piece begins as raw full-grain hide, selected by hand in our atelier. Skilled artisans spend days cutting, stitching, and finishing each item — no shortcuts, no compromises.</p>
+      <a href="#" class="btn-primary featured-btn-margin" onclick="event.preventDefault(); showToast('Our process brochure is downloading!')"><span>Discover Our Process</span></a>
       <div class="featured-facts">
         <div class="fact-item"><div class="fact-num">18+</div><div class="fact-label">Years of Craft</div></div>
         <div class="fact-item"><div class="fact-num">150k</div><div class="fact-label">Happy Owners</div></div>
@@ -298,19 +298,19 @@
         <div class="process-title">Hide Selection</div>
         <p class="process-text">We source only the finest full-grain hides, selected by hand for texture, weight, and character.</p>
       </div>
-      <div class="process-item reveal" style="transition-delay:0.1s">
+      <div class="process-item reveal delay-100">
         <div class="process-num">02</div>
         <div class="process-icon">✂️</div>
         <div class="process-title">Pattern Cutting</div>
         <p class="process-text">Master cutters trace each pattern by hand, ensuring grain alignment and minimal waste.</p>
       </div>
-      <div class="process-item reveal" style="transition-delay:0.2s">
+      <div class="process-item reveal delay-200">
         <div class="process-num">03</div>
         <div class="process-icon">🧵</div>
         <div class="process-title">Hand Stitching</div>
         <p class="process-text">Saddle-stitched by hand with waxed linen thread for strength that outlasts machine sewing.</p>
       </div>
-      <div class="process-item reveal" style="transition-delay:0.3s">
+      <div class="process-item reveal delay-300">
         <div class="process-num">04</div>
         <div class="process-icon">✨</div>
         <div class="process-title">Burnishing & Care</div>
@@ -336,7 +336,7 @@
           <div><div class="author-name">Arjun Mehta</div><div class="author-loc">Mumbai, India</div></div>
         </div>
       </div>
-      <div class="testimonial-card reveal" style="transition-delay:0.15s">
+      <div class="testimonial-card reveal delay-150">
         <div class="testimonial-quote">"</div>
         <p class="testimonial-text">I gifted my husband the espresso bifold wallet and he hasn't put it down. The quality is immediately evident — it feels like a luxury item without the pretentious price tag.</p>
         <div class="testimonial-author">
@@ -344,7 +344,7 @@
           <div><div class="author-name">Priya Sharma</div><div class="author-loc">Delhi, India</div></div>
         </div>
       </div>
-      <div class="testimonial-card reveal" style="transition-delay:0.3s">
+      <div class="testimonial-card reveal delay-300">
         <div class="testimonial-quote">"</div>
         <p class="testimonial-text">The monogramming service added such a personal touch. I ordered three belts for my brothers as birthday gifts and the presentation box alone made an impression.</p>
         <div class="testimonial-author">
@@ -366,7 +366,7 @@
     <div class="blog-grid reveal">
       <a href="#" class="blog-card" onclick="event.preventDefault(); showToast('Article coming soon!')">
         <div class="blog-img">
-          <div class="blog-img-bg blog-bg1" style="height:100%"></div>
+          <div class="blog-img-bg blog-bg1 blog-bg-fill"></div>
         </div>
         <div class="blog-body">
           <div class="blog-meta">
@@ -381,7 +381,7 @@
       <div class="blog-right">
         <a href="#" class="blog-card blog-card-small" onclick="event.preventDefault(); showToast('Article coming soon!')">
           <div class="blog-img">
-            <div class="blog-img-bg blog-bg2" style="height:100%"></div>
+            <div class="blog-img-bg blog-bg2 blog-bg-fill"></div>
           </div>
           <div class="blog-body">
             <div class="blog-meta">
@@ -395,7 +395,7 @@
         </a>
         <a href="#" class="blog-card blog-card-small" onclick="event.preventDefault(); showToast('Article coming soon!')">
           <div class="blog-img">
-            <div class="blog-img-bg blog-bg3" style="height:100%"></div>
+            <div class="blog-img-bg blog-bg3 blog-bg-fill"></div>
           </div>
           <div class="blog-body">
             <div class="blog-meta">

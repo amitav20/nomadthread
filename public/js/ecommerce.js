@@ -623,42 +623,8 @@ function handleNewsletter(e) {
 }
 
 // ─── CURSOR ────────────────────────────────────────────
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+window.bindCursorExpands = function() {};
 
-if (cursor && ring) {
-  document.addEventListener('mousemove', e => { 
-    mouseX = e.clientX; 
-    mouseY = e.clientY; 
-    cursor.style.left = mouseX+'px'; 
-    cursor.style.top = mouseY+'px'; 
-  });
-  
-  function animateRing() {
-    ringX += (mouseX - ringX) * 0.18;
-    ringY += (mouseY - ringY) * 0.18;
-    ring.style.left = ringX+'px';
-    ring.style.top = ringY+'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-  
-  function bindCursorExpands() {
-    document.querySelectorAll('a, button, [class*="btn"], .cat-card, .product-card, .blog-card, .swatch, .forum-search-input, .comment-textarea, .filter-color-btn').forEach(el => {
-      el.removeEventListener('mouseenter', expandRing);
-      el.removeEventListener('mouseleave', shrinkRing);
-      el.addEventListener('mouseenter', expandRing);
-      el.addEventListener('mouseleave', shrinkRing);
-    });
-  }
-  
-  function expandRing() { ring.classList.add('expand'); }
-  function shrinkRing() { ring.classList.remove('expand'); }
-  
-  window.bindCursorExpands = bindCursorExpands;
-  bindCursorExpands();
-}
 
 // ─── SCROLL ────────────────────────────────────────────
 const scrollTop = document.getElementById('scrollTop');

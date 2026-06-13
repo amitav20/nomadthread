@@ -4,14 +4,14 @@
 
 @section('content')
 <div class="forum-section">
-  <div class="section-inner" style="max-width:960px">
+  <div class="section-inner max-width-960">
     
     <!-- Back Button -->
     <a href="{{ route('threads.index') }}" class="thread-back-link">← Back to discussions</a>
 
     <!-- Thread Details -->
     <article class="thread-details-container reveal">
-      <div class="thread-meta" style="margin-bottom:20px">
+      <div class="thread-meta margin-bottom-20">
         <span class="thread-badge">{{ $thread->location }}</span>
         <span>&bull;</span>
         <span class="thread-author">Posted by {{ $thread->user->name }}</span>
@@ -21,7 +21,7 @@
       
       <h1 class="thread-details-title">{{ $thread->title }}</h1>
       
-      <div style="width:100%; height:1px; background:var(--border); margin: 32px 0;"></div>
+      <div class="thread-divider"></div>
       
       <div class="thread-content-body">
         {!! nl2br(e($thread->content)) !!}
@@ -29,7 +29,7 @@
     </article>
 
     <!-- Comments Section -->
-    <div class="reveal" style="margin-top:56px">
+    <div class="reveal comments-container-margin">
       <h3 class="comments-section-title">Discussion Responses</h3>
       
       <!-- New Reply Form -->

@@ -12,46 +12,15 @@
 
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
-        body {
-            font-family: 'Outfit', 'Instrument Sans', sans-serif;
-        }
-        .sidebar-glass {
-            background: #251710 !important; /* Rich dark espresso leather */
-            border-right: 1px solid #362319 !important;
-        }
-        .table-glass {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .nav-item-backend {
-            color: #d7c9bd !important;
-            transition: all 0.15s;
-        }
-        .nav-item-backend:hover {
-            background: #362319 !important;
-            color: #ffffff !important;
-        }
-        .nav-item-backend.active {
-            background: linear-gradient(135deg, rgba(201, 168, 76, 0.25), rgba(201, 168, 76, 0.08)) !important;
-            color: #c9a84c !important;
-            border: 1px solid rgba(201, 168, 76, 0.35) !important;
-        }
-        .backend-header {
-            background: #251710 !important;
-            border-bottom: 1px solid #362319 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
-<body class="flex h-full overflow-hidden bg-slate-950">
+<body class="admin-body flex h-full overflow-hidden bg-slate-950">
 
     <!-- Sidebar Navigation -->
     <aside class="w-64 sidebar-glass flex flex-col justify-between shrink-0">
         <div>
             <!-- Header/Logo -->
-            <div class="h-16 flex items-center px-6 border-b border-slate-800/80" style="border-bottom-color: #362319;">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800/80 border-b-espresso">
                 <a href="{{ route('backend.dashboard') }}" id="sidebar-logo" class="flex items-center gap-2 text-decoration-none">
                     <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-[#c9a84c] to-[#a88734] flex items-center justify-center text-[#251710] font-bold">
                         NT
@@ -91,7 +60,7 @@
 
         <!-- Back to Website -->
         <div class="p-4 border-t border-slate-800/80" style="border-top-color: #362319;">
-            <a href="{{ route('home') }}" id="admin-nav-exit" class="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-300" style="background-color: #1d1109; border: 1px solid #362319; color: #d7c9bd;" onmouseover="this.style.backgroundColor='#362319'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#1d1109'; this.style.color='#d7c9bd';">
+            <a href="{{ route('home') }}" id="admin-nav-exit" class="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-300 admin-nav-exit-btn">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                 </svg>
@@ -126,7 +95,7 @@
                 
                 <form action="{{ route('backend.logout') }}" method="POST" class="inline-block">
                     @csrf
-                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-300" style="background-color: #1d1109; border-color: #362319; color: #d7c9bd;" onmouseover="this.style.backgroundColor='#362319'; this.style.color='#ffffff'; this.style.borderColor='rgba(201,168,76,0.35)';" onmouseout="this.style.backgroundColor='#1d1109'; this.style.color='#d7c9bd'; this.style.borderColor='#362319';" title="Logout">
+                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-300 backend-logout-btn" title="Logout">
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                         </svg>

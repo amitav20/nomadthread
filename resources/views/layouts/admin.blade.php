@@ -6,9 +6,9 @@
 <title>@yield('title', 'LeatherCraft — Admin Panel')</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
-<body>
+<body class="admin-body">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -57,18 +57,18 @@
   </div>
   <div class="sidebar-footer">
     @if(Auth::check())
-    <div class="admin-avatar" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
-      <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;">
-        <div class="avatar-circle" style="flex-shrink: 0;">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
-        <div class="avatar-info" style="min-width: 0; flex-grow: 1;">
-          <p style="margin: 0; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Auth::user()->name }}</p>
-          <span style="font-size: 11px; color: var(--text3);">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'User' }}</span>
+    <div class="admin-avatar admin-avatar-wrap">
+      <div class="admin-avatar-inner">
+        <div class="avatar-circle flex-shrink-0">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+        <div class="avatar-info avatar-info-wrap">
+          <p class="avatar-name">{{ Auth::user()->name }}</p>
+          <span class="avatar-role">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'User' }}</span>
         </div>
       </div>
-      <form action="{{ route('backend.logout') }}" method="POST" style="margin: 0; margin-left: auto; display: flex; align-items: center; flex-shrink: 0;">
+      <form action="{{ route('backend.logout') }}" method="POST" class="admin-logout-form">
         @csrf
-        <button type="submit" style="background: none; border: none; color: var(--text3); cursor: pointer; padding: 4px; display: flex; align-items: center; transition: color 0.2s;" onmouseover="this.style.color='#f43f5e'" onmouseout="this.style.color='var(--text3)'" title="Logout">
-          <i class="ti ti-logout" style="font-size: 18px;"></i>
+        <button type="submit" class="admin-logout-btn" title="Logout">
+          <i class="ti ti-logout fs-18"></i>
         </button>
       </form>
     </div>
@@ -84,7 +84,7 @@
       <div class="header-breadcrumb" id="pageBreadcrumb">@yield('page_breadcrumb', 'Admin / Dashboard')</div>
     </div>
     <div class="header-search">
-      <i class="ti ti-search" style="color:var(--text3)"></i>
+      <i class="ti ti-search text3-color"></i>
       <input type="text" placeholder="Search products, orders…">
     </div>
     <div class="header-actions">

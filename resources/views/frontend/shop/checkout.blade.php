@@ -71,22 +71,22 @@
             <!-- Static Payment Methods -->
             <div class="checkout-payment-methods">
               <label class="payment-method-label active">
-                <input type="radio" name="payment_method" value="Credit Card" checked style="display:none;">
+                <input type="radio" name="payment_method" value="Credit Card" checked class="display-none">
                 <span class="pm-icon">💳</span>
                 <span class="pm-text">Card</span>
               </label>
               <label class="payment-method-label" onclick="selectPaymentMethod('UPI', this)">
-                <input type="radio" name="payment_method" value="UPI" style="display:none;">
+                <input type="radio" name="payment_method" value="UPI" class="display-none">
                 <span class="pm-icon">📱</span>
                 <span class="pm-text">UPI</span>
               </label>
               <label class="payment-method-label" onclick="selectPaymentMethod('Net Banking', this)">
-                <input type="radio" name="payment_method" value="Net Banking" style="display:none;">
+                <input type="radio" name="payment_method" value="Net Banking" class="display-none">
                 <span class="pm-icon">🏦</span>
                 <span class="pm-text">NetBank</span>
               </label>
               <label class="payment-method-label" onclick="selectPaymentMethod('COD', this)">
-                <input type="radio" name="payment_method" value="COD" style="display:none;">
+                <input type="radio" name="payment_method" value="COD" class="display-none">
                 <span class="pm-icon">📦</span>
                 <span class="pm-text">COD</span>
               </label>
@@ -94,12 +94,12 @@
 
             <!-- Credit Card Form -->
             <div id="creditCardDetails">
-              <div style="margin-bottom: 15px;">
+              <div class="mb-15">
                 <label class="checkout-label">Cardholder Name</label>
                 <input type="text" id="cardName" placeholder="Name on card" class="checkout-input">
               </div>
 
-              <div style="margin-bottom: 15px;">
+              <div class="mb-15">
                 <label class="checkout-label">Card Number</label>
                 <div class="card-field-wrap">
                   <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this)" class="checkout-input card-number">
@@ -120,7 +120,7 @@
             </div>
 
             <!-- Alternative Methods Info -->
-            <div id="alternativePaymentDetails" class="alt-payment-box" style="display: none;">
+             <div id="alternativePaymentDetails" class="alt-payment-box display-none">
               <span id="alternativePaymentText">Selected payment method requires redirection or validation upon submission.</span>
             </div>
 
@@ -183,43 +183,33 @@
 </section>
 
 <!-- 3D SECURE AUTH MODAL (HIGH SECURITY SIMULATION) -->
-<div id="securePaymentModal" style="display: none; position: fixed; inset: 0; background: rgba(13, 8, 5, 0.95); z-index: 9999; align-items: center; justify-content: center; font-family: 'Jost', sans-serif;">
-  <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 40px; max-width: 480px; width: 90%; text-align: center; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+<div id="securePaymentModal" class="secure-modal-backdrop">
+  <div class="secure-modal-content">
     
     <!-- Lock Icon Anim -->
-    <div style="font-size: 50px; margin-bottom: 25px; animation: pulse 1.5s infinite;">🔒</div>
+    <div class="secure-lock-icon">🔒</div>
     
-    <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 12px;" id="secureStatusTitle">
+    <h3 class="secure-modal-title" id="secureStatusTitle">
       Securing Connection...
     </h3>
-    <p style="color: var(--text-light); font-size: 13.5px; margin-bottom: 30px;" id="secureStatusDesc">
+    <p class="secure-modal-desc" id="secureStatusDesc">
       Establishing a fully encrypted sandbox connection to the central host banking systems.
     </p>
 
     <!-- Secure Spinner -->
-    <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
-      <div class="secure-dot" style="width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite 0s;"></div>
-      <div class="secure-dot" style="width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite 0.2s;"></div>
-      <div class="secure-dot" style="width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite 0.4s;"></div>
+    <div class="secure-dots-wrap">
+      <div class="secure-dot secure-bounce-dot delay-0"></div>
+      <div class="secure-dot secure-bounce-dot delay-200ms"></div>
+      <div class="secure-dot secure-bounce-dot delay-400ms"></div>
     </div>
     
-    <div style="font-size: 11px; text-transform: uppercase; color: var(--gold); letter-spacing: 2px;">
+    <div class="secure-modal-footer-badge">
       PCI-DSS Level 1 Encryption
     </div>
   </div>
 </div>
 
-<style>
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; color: var(--gold); }
-    100% { transform: scale(1); opacity: 0.8; }
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-</style>
+
 
 <script>
   let selectedPaymentMethod = 'Credit Card';
@@ -306,7 +296,7 @@
     }
 
     if (items.length === 0) {
-      summaryItems.innerHTML = `<div style="text-align:center; padding: 30px; font-size:13px; color:var(--text-light);">No items in cart.</div>`;
+      summaryItems.innerHTML = `<div class="checkout-summary-empty">No items in cart.</div>`;
       window.location.href = "{{ route('shop.index') }}";
       return;
     }
@@ -317,21 +307,21 @@
 
     // Render items in summary
     summaryItems.innerHTML = items.map(item => `
-      <div style="display:flex; justify-content:space-between; align-items:center; font-family:'Jost',sans-serif; font-size:13px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="position:relative; width:45px; height:45px; border-radius:4px; border:1px solid var(--border); overflow:hidden; background:var(--bg3);">
+      <div class="checkout-summary-row">
+        <div class="checkout-summary-item-left">
+          <div class="checkout-summary-thumb-wrap">
             ${item.image_path 
-              ? `<img src="${getAssetUrl(item.image_path)}" style="width:100%; height:100%; object-fit:cover;">`
-              : `<div class="product-visual cart-item-mini ${item.shape || 'bag-shape'} color-${item.color}" style="width:100%; height:100%;"></div>`
+              ? `<img src="${getAssetUrl(item.image_path)}" class="product-img-el">`
+              : `<div class="product-visual cart-item-mini ${item.shape || 'bag-shape'} color-${item.color} w-full-h-full"></div>`
             }
-            <span style="position:absolute; right:-2px; top:-2px; background:var(--gold); color:var(--bg); border-radius:50%; font-size:9px; font-weight:600; width:15px; height:15px; display:flex; align-items:center; justify-content:center;">${item.qty}</span>
+            <span class="checkout-summary-badge">${item.qty}</span>
           </div>
           <div>
-            <div style="color:var(--cream); font-weight:500;">${item.name}</div>
-            <div style="color:var(--text-light); font-size:11px; text-transform:capitalize;">Color: ${item.color}</div>
+            <div class="checkout-summary-item-name">${item.name}</div>
+            <div class="checkout-summary-item-color">Color: ${item.color}</div>
           </div>
         </div>
-        <span style="color:var(--cream); font-weight:500;">${formatPrice(item.price * item.qty)}</span>
+        <span class="checkout-summary-item-price">${formatPrice(item.price * item.qty)}</span>
       </div>
     `).join('');
 

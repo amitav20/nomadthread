@@ -8,30 +8,30 @@
 @endphp
 
 @if($shopBanner)
-  <section class="page-hero-section" style="padding: 120px 0 60px; background: var(--espresso); position: relative; overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center; text-align: center;">
+  <section class="page-hero-section">
     @if(!empty($shopBanner['video']))
-      <video autoplay loop muted playsinline style="position: absolute; inset: 0; width:100%; height:100%; object-fit:cover; opacity: 0.4;">
+      <video autoplay loop muted playsinline class="page-hero-video">
         <source src="{{ asset($shopBanner['video']) }}" type="video/mp4">
       </video>
     @elseif(!empty($shopBanner['image']))
-      <div style="position: absolute; inset:0; background-image: url('{{ asset($shopBanner['image']) }}'); background-size: cover; background-position: center; opacity: 0.4;"></div>
+      <div class="page-hero-bg-img" style="background-image: url('{{ asset($shopBanner['image']) }}');"></div>
     @endif
-    <div style="position: absolute; inset:0; background: linear-gradient(to bottom, rgba(44,26,14,0.6), rgba(44,26,14,0.85)); z-index:1;"></div>
-    <div class="section-inner" style="position: relative; z-index: 2;">
-      <span style="font-family:'Jost', sans-serif; font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--tan-light); margin-bottom:12px; display:block;">
+    <div class="page-hero-overlay"></div>
+    <div class="section-inner position-relative z-20">
+      <span class="page-hero-subHeadline">
         {{ $shopBanner['subheadline'] ?? 'Nomad Thread Catalog' }}
       </span>
-      <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 700; color: var(--cream); line-height: 1.2;">
+      <h1 class="page-hero-headline">
         <em>{{ $shopBanner['title'] }}</em>
       </h1>
       @if(!empty($shopBanner['cta_text']))
-        <a href="{{ $shopBanner['cta_link'] ?? '#' }}" class="btn-primary" style="margin-top: 15px; display: inline-block; padding: 12px 28px;"><span>{{ $shopBanner['cta_text'] }}</span></a>
+        <a href="{{ $shopBanner['cta_link'] ?? '#' }}" class="btn-primary page-hero-cta"><span>{{ $shopBanner['cta_text'] }}</span></a>
       @endif
     </div>
   </section>
 @endif
 
-<section class="products-section" style="{{ $shopBanner ? 'padding: 60px 0;' : 'padding-top: 140px;' }} min-height: 80vh;">
+<section class="products-section products-section-wrap {{ $shopBanner ? 'has-banner' : 'no-banner' }}">
   <div class="section-inner">
     @if(!$shopBanner)
       <div class="section-header reveal visible">
@@ -42,17 +42,17 @@
     @endif
 
     <!-- Category Filter Bar -->
-    <div class="filter-bar reveal visible" style="margin-bottom: 30px; justify-content: center; display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="{{ route('shop.index') }}" class="filter-btn active" style="text-decoration:none" data-category="all">All</a>
+    <div class="filter-bar reveal visible catalog-filter-bar">
+      <a href="{{ route('shop.index') }}" class="filter-btn active text-decoration-none" data-category="all">All</a>
       @foreach($categories as $cat)
-        <a href="{{ route('shop.category', $cat['slug']) }}" class="filter-btn" style="text-decoration:none" data-category="{{ $cat['slug'] }}">
+        <a href="{{ route('shop.category', $cat['slug']) }}" class="filter-btn text-decoration-none" data-category="{{ $cat['slug'] }}">
           {{ $cat['name'] }}
         </a>
       @endforeach
     </div>
 
     <!-- Gender Filter Bar -->
-    <div class="gender-filter-bar reveal visible" style="margin-bottom: 15px;">
+    <div class="gender-filter-bar reveal visible catalog-gender-filter-bar">
       <span class="gender-label">Collection For:</span>
       <button onclick="filterByGender('all')" class="gender-btn active" id="gender-all">All</button>
       <button onclick="filterByGender('men')" class="gender-btn" id="gender-men">Men</button>
@@ -60,29 +60,29 @@
     </div>
 
     <!-- Toggle Advanced Filters -->
-    <div class="reveal visible" style="text-align: center; margin-bottom: 30px;">
-      <button id="filterPanelToggleBtn" onclick="toggleFilterPanel()" class="gender-btn" style="background: transparent; border: 1px solid var(--border); color: var(--gold); padding: 8px 20px; font-family: 'Jost', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+    <div class="reveal visible catalog-toggle-wrapper">
+      <button id="filterPanelToggleBtn" onclick="toggleFilterPanel()" class="gender-btn filter-toggle-btn">
         Filter Catalog &darr;
       </button>
     </div>
 
     <!-- Advanced Filter Panel -->
-    <div id="advancedFilterPanel" class="reveal visible" style="display: none; background: var(--bg-card); border: 1px solid var(--border); padding: 25px; margin-bottom: 40px; border-radius: 8px; transition: all 0.3s ease;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+    <div id="advancedFilterPanel" class="reveal visible catalog-advanced-filter-panel">
+      <div class="filter-grid-4col">
         
         <!-- Search -->
         <div>
-          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Search</h5>
-          <input type="text" id="filterSearchInput" oninput="handleSearchInput(this.value)" placeholder="Search products..." style="width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; border-radius: 4px;">
+          <h5 class="filter-column-title">Search</h5>
+          <input type="text" id="filterSearchInput" oninput="handleSearchInput(this.value)" placeholder="Search products..." class="filter-search-input">
         </div>
 
         <!-- Price Range -->
         <div>
-          <h5 style="font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">
-            Max Price: <span id="priceRangeLabel" style="color: var(--gold);">₹50,000</span>
+          <h5 class="filter-column-title-price">
+            Max Price: <span id="priceRangeLabel" class="price-range-label">₹50,000</span>
           </h5>
-          <input type="range" id="filterPriceRange" min="1000" max="50000" step="500" value="50000" oninput="updatePriceLabel(this.value); triggerFilters();" style="width: 100%; accent-color: var(--gold); cursor: pointer; background: var(--border); height: 4px; border-radius: 2px; outline: none;">
-          <div style="display: flex; justify-content: space-between; font-size: 10px; font-family: 'Jost', sans-serif; color: var(--text-light); margin-top: 5px;">
+          <input type="range" id="filterPriceRange" min="1000" max="50000" step="500" value="50000" oninput="updatePriceLabel(this.value); triggerFilters();" class="price-range-slider">
+          <div class="price-range-footer">
             <span>₹1,000</span>
             <span>₹50,000</span>
           </div>
@@ -90,8 +90,8 @@
 
         <!-- Sort By -->
         <div>
-          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Sort By</h5>
-          <select id="filterSortSelect" onchange="handleSortSelect(this.value)" style="width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; border-radius: 4px; cursor: pointer;">
+          <h5 class="filter-column-title">Sort By</h5>
+          <select id="filterSortSelect" onchange="handleSortSelect(this.value)" class="sort-select">
             <option value="default">Default Sorting</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
@@ -102,14 +102,14 @@
 
         <!-- Filter Colors -->
         <div>
-          <h5 style="font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; font-weight: 500;">Colors</h5>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-height: 38px;">
+          <h5 class="filter-column-title">Colors</h5>
+          <div class="color-swatch-wrapper">
             @php
               $allColors = ['tan', 'espresso', 'cognac', 'black', 'olive', 'wine', 'camel', 'slate'];
             @endphp
             @foreach($allColors as $c)
-              <div onclick="toggleColorFilter('{{ $c }}', this)" class="filter-color-btn" style="width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="{{ ucfirst($c) }}">
-                <div class="swatch-{{ $c }}" style="width: 18px; height: 18px; border-radius: 50%;"></div>
+              <div onclick="toggleColorFilter('{{ $c }}', this)" class="filter-color-btn" title="{{ ucfirst($c) }}">
+                <div class="swatch-{{ $c }} filter-color-btn-inner"></div>
               </div>
             @endforeach
           </div>
@@ -117,8 +117,8 @@
 
       </div>
 
-      <div style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px;">
-        <button onclick="resetFilters()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 16px; font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)'" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)'">
+      <div class="filter-panel-footer">
+        <button onclick="resetFilters()" class="clear-filters-btn">
           Clear Filters
         </button>
       </div>
@@ -139,9 +139,9 @@
             @endif
             <button class="product-wishlist" onclick="toggleWishlist(this)" title="Wishlist">♡</button>
             <div class="product-thumb">
-              <a href="{{ route('shop.product', $p['sku']) }}" style="display:block; width:100%; height:100%">
+              <a href="{{ route('shop.product', $p['sku']) }}" class="display-block-w-full-h-full">
                 @if(!empty($p['images']))
-                  <img src="{{ asset(ltrim($p['images'][0]['image_path'], '/')) }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" style="width:100%; height:100%; object-fit:cover;" id="thumb-{{ $p['id'] }}">
+                  <img src="{{ asset(ltrim($p['images'][0]['image_path'], '/')) }}" alt="{{ $p['images'][0]['alt_text'] ?? $p['name'] }}" class="product-img-el" id="thumb-{{ $p['id'] }}">
                 @else
                   <div class="product-visual {{ $p['shape'] ?? 'bag-shape' }} color-{{ $firstColor }}" data-product="{{ $p['id'] }}" id="thumb-{{ $p['id'] }}"></div>
                 @endif
@@ -161,7 +161,7 @@
               @endforeach
             </div>
             <div class="product-name">
-              <a href="{{ route('shop.product', $p['sku']) }}" style="color:inherit; text-decoration:none">{{ $p['name'] }}</a>
+              <a href="{{ route('shop.product', $p['sku']) }}" class="product-name-link">{{ $p['name'] }}</a>
             </div>
             <div class="product-type">{{ $p['type'] }}</div>
             <div class="product-price">
@@ -174,7 +174,7 @@
           </div>
         </div>
       @empty
-        <div style="grid-column: 1/-1; text-align:center; padding: 80px 20px; font-family:'Cormorant Garamond',serif; font-size:24px; color:var(--text-light)">
+        <div class="product-grid-empty">
           No products found in this category.
         </div>
       @endforelse
@@ -182,10 +182,5 @@
   </div>
 </section>
 
-<style>
-  .filter-color-btn.active {
-    border-color: var(--gold) !important;
-    transform: scale(1.15);
-  }
-</style>
+
 @endsection

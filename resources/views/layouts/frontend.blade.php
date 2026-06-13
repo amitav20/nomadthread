@@ -10,13 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <!-- Premium Artisan Stylesheet -->
-  <link href="{{ asset('css/ecommerce.css') }}?v={{ time() }}" rel="stylesheet" />
-
-  <style>
-    .mega-menu {
-      z-index: 1100;
-    }
-  </style>
+  <link href="{{ asset('css/app.css') }}?v={{ time() }}" rel="stylesheet" />
 
   <script>
     window.routes = {
@@ -29,9 +23,7 @@
 </head>
 <body>
 
-  <!-- CUSTOM CURSOR -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
+
 
   <!-- DRAWER OVERLAY -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeCart()"></div>
@@ -50,7 +42,7 @@
         <span>Subtotal</span>
         <span class="cart-total-num" id="cartTotal">₹0</span>
       </div>
-      <a href="{{ route('checkout') }}" class="btn-checkout" style="text-decoration:none; display:flex; align-items:center; justify-content:center; text-align:center;">Proceed to Checkout</a>
+      <a href="{{ route('checkout') }}" class="btn-checkout btn-checkout-link">Proceed to Checkout</a>
       <button class="btn-continue" onclick="closeCart()">Continue Shopping</button>
     </div>
   </div>
@@ -58,12 +50,12 @@
   <!-- PRODUCT QUICK VIEW MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal" id="modalContent">
-      <div class="modal-img" style="display: flex; flex-direction: column; gap: 20px; padding: 40px; min-height: 460px; justify-content: center; align-items: center;">
-        <button class="modal-close" onclick="closeModalDirect()" style="z-index:20;">✕</button>
-        <div id="modalMainContainer" style="position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 280px;">
+      <div class="modal-img modal-img-container">
+        <button class="modal-close z-20" onclick="closeModalDirect()">✕</button>
+        <div id="modalMainContainer" class="modal-main-container">
           <div class="product-visual modal-img-visual" id="modalVisual"></div>
         </div>
-        <div id="modalProductThumbs" style="display: flex; gap: 8px; overflow-x: auto; width: 100%; justify-content: center; z-index: 10;"></div>
+        <div id="modalProductThumbs" class="modal-thumbs-container"></div>
       </div>
       <div class="modal-detail">
         <div class="product-type" id="modalType">Leather Bags</div>
@@ -92,14 +84,14 @@
   <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg">Added to cart</span></div>
 
   <!-- TOP BAR -->
-  <div class="top-bar" style="padding: 10px 0;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;">
-      <div style="text-align: left; flex-grow: 1;">
+  <div class="top-bar top-bar-custom">
+    <div class="top-bar-inner">
+      <div class="text-left-grow">
         {!! $siteSettings['top_bar_text'] ?? '<span>✦</span> Free shipping on orders above ₹5,000 &nbsp;|&nbsp; Handcrafted with full-grain leather &nbsp;|&nbsp; <span>✦</span> 10% off on first order — Use CRAFT10' !!}
       </div>
-      <div class="country-selector-wrap" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-        <span style="font-size: 11px; font-family: 'Jost', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: var(--cream);">Country:</span>
-        <select id="countrySelector" onchange="changeCountryCode(this.value)" style="background: rgba(26,17,11,0.85); border: 1px solid var(--border); color: var(--cream); font-family: 'Jost', sans-serif; font-size: 12px; padding: 4px 8px; border-radius: 4px; cursor: pointer; outline: none; transition: border-color 0.2s;">
+      <div class="country-selector-wrap flex-center-gap-8">
+        <span class="country-label">Country:</span>
+        <select id="countrySelector" onchange="changeCountryCode(this.value)" class="country-select">
           @foreach($sharedCountries as $country)
             <option value="{{ $country->code }}">{{ $country->name }} ({{ $country->currency_code }} {{ $country->currency_symbol }})</option>
           @endforeach
@@ -111,20 +103,20 @@
   <!-- HEADER -->
   <header>
     <div class="header-inner">
-      <a href="{{ route('home') }}" class="logo-wrap" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none;">
+      <a href="{{ route('home') }}" class="logo-wrap logo-link">
         @if(!empty($siteSettings['logo_image']))
-          <img src="{{ asset(ltrim($siteSettings['logo_image'], '/')) }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px;">
+          <img src="{{ asset(ltrim($siteSettings['logo_image'], '/')) }}" alt="Logo" class="logo-img">
         @else
-          <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px;">
+          <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="logo-img">
         @endif
-        <span class="logo" style="color: var(--sage);">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
+        <span class="logo logo-text-sage">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
       </a>
       <nav>
         <a href="{{ route('home') }}" class="nav-item {{ Route::is('home') ? 'active' : '' }}">Home</a>
         <a href="{{ route('shop.index') }}" class="nav-item {{ Route::is('shop.index') && !Request::routeIs('shop.category') ? 'active' : '' }}">Shop</a>
         
         <div class="has-mega">
-          <span class="nav-item {{ Request::routeIs('shop.category') ? 'active' : '' }}" style="cursor:pointer">Categories ▾</span>
+          <span class="nav-item {{ Request::routeIs('shop.category') ? 'active' : '' }} cursor-pointer">Categories ▾</span>
           <div class="mega-menu">
             <div class="mega-col">
               <h4>Browse Categories</h4>
@@ -159,16 +151,16 @@
         <button class="icon-btn" title="Wishlist" onclick="showToast('Your wishlist contains 0 items.')">♡</button>
         @auth
           @if(Auth::user()->role === 'admin')
-            <a href="{{ route('backend.dashboard') }}" class="icon-btn" title="Admin Dashboard" style="text-decoration:none">⊙</a>
+            <a href="{{ route('backend.dashboard') }}" class="icon-btn text-decoration-none" title="Admin Dashboard">⊙</a>
           @endif
-          <form action="{{ route('logout') }}" method="POST" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
+          <form action="{{ route('logout') }}" method="POST" class="logout-form">
             @csrf
-            <button type="submit" class="icon-btn" title="Logout" style="background:none; border:none; cursor:pointer; font-size:18px;">⏻</button>
+            <button type="submit" class="icon-btn logout-btn" title="Logout">⏻</button>
           </form>
         @else
-          <a href="{{ route('login') }}" class="icon-btn" title="Login" style="text-decoration:none">👤</a>
+          <a href="{{ route('login') }}" class="icon-btn text-decoration-none" title="Login">👤</a>
         @endauth
-        <button class="icon-btn" title="Cart" onclick="openCart()" style="position:relative">
+        <button class="icon-btn position-relative" title="Cart" onclick="openCart()">
           🛍
           <span class="cart-count" id="cartBadge">0</span>
         </button>
@@ -185,13 +177,13 @@
   <footer>
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="{{ route('home') }}" class="logo-wrap" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none;">
+        <a href="{{ route('home') }}" class="logo-wrap logo-link">
           @if(!empty($siteSettings['logo_image']))
-            <img src="{{ asset(ltrim($siteSettings['logo_image'], '/')) }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px; filter: brightness(1.2);">
+            <img src="{{ asset(ltrim($siteSettings['logo_image'], '/')) }}" alt="Logo" class="footer-logo-img">
           @else
-            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: auto; border-radius: 4px; filter: brightness(1.2);">
+            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="footer-logo-img">
           @endif
-          <span class="logo" style="color: var(--cream);">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
+          <span class="logo logo-text-cream">{{ $siteSettings['logo_text'] ?? 'NOMAD THREAD' }}</span>
         </a>
         <p class="footer-tagline">{{ $siteSettings['footer_tagline'] ?? 'Artisan leather goods handcrafted in India, built to last a lifetime and grow more beautiful with every use.' }}</p>
         <div class="footer-social">
